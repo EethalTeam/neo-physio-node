@@ -15,7 +15,7 @@ exports.createCountry = async (req, res) => {
         if (existingCountry) {
             return res.status(400).json({ message: 'Country with this code or name already exists' });
         }
-        // Create and save the new State
+        // Create and save the new Country
         const country = new Country({ countryName, countryCode , isActive });
         await country.save();
 
@@ -57,7 +57,7 @@ exports.getAllCountry = async (req, res) => {
 // Get a single Country by name
 exports.getCountryByName = async (req, res) => {
     try {
-        const country = await Country.findOne({ countryName: req.params.name })
+        const country = await Country.findOne({ countryName: req.body.name })
     
         if (!country) {
             return res.status(400).json({ message: 'Country not found' });
@@ -92,7 +92,7 @@ exports.updateCountry= async (req, res) => {
 
 
 // Delete a Country
-exports.countryState = async (req, res) => {
+exports.deleteCountry = async (req, res) => {
     try {
         const { _id } = req.body;
         
