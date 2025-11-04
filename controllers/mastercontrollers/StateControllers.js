@@ -1,4 +1,5 @@
-const State = require('../../models/masterModels/State');
+const mongoose = require('mongoose');
+const State = require('../../model/masterModels/State');
 
 // Fields to extract for the response
 // const fieldsToExtract = ['_id', 'StateCode', 'StateName', 'isActive'];
