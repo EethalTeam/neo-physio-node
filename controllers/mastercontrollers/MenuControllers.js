@@ -1,6 +1,7 @@
-const Menu = require("../../models/masterModels/MenuRegistry");
-const UserRights = require("../../models/masterModels/UserRights");
-const Employee = require("../../models/masterModels/Employee");
+const mongoose = require('mongoose');
+const Menu = require("../../model/masterModels/MenuRegistry");
+const UserRights = require("../../model/masterModels/UserRights");
+// const Employee = require("../../model/masterModels/Employee");
 
 exports.createMenu = async (req, res) => {
   try {
@@ -104,19 +105,19 @@ exports.deleteMenu = async (req, res) => {
   }
 };
 
-exports.getAllEmployees = async (req, res) => {
-  try {
-    const employees = await Employee.find().populate("department", "name");
+// exports.getAllEmployees = async (req, res) => {
+//   try {
+//     const employees = await Employee.find().populate("department", "name");
 
-    return res.status(200).json({
-      success: true,
-      data: employees,
-    });
-  } catch (error) {
-    console.error("❌ getAllEmployees error:", error);
-    return res.status(500).json({ success: false, message: "Server error" });
-  }
-};
+//     return res.status(200).json({
+//       success: true,
+//       data: employees,
+//     });
+//   } catch (error) {
+//     console.error("❌ getAllEmployees error:", error);
+//     return res.status(500).json({ success: false, message: "Server error" });
+//   }
+// };
 
 exports.getAllParentsMenu = async (req, res) => {
   try {

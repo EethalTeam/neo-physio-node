@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const http = require('http');
 const { Server } = require('socket.io');
 
-// const masterRoutes = require('./routes/masterRoutes');
+const masterRoutes = require('./router/masterRoutes');
 // const mainRoutes = require('./routes/mainRoutes');
 // const authRoutes = require('./routes/authRoutes');
 // const Notification = require('./models/masterModels/Notifications');
@@ -42,7 +42,7 @@ app.get('/privacy', (req, res) => {
 });
 // app.use("/webhook", webhookRoutes);
 // app.use('/api', authRoutes);
-// app.use('/api', checkLogin, masterRoutes);
+app.use('/api', masterRoutes);
 // app.use('/api', mainRoutes);
 
 app.get('/test', (req, res) => {

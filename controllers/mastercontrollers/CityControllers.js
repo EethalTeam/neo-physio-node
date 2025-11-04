@@ -1,5 +1,5 @@
-const City = require('../../models/masterModels/City')
-const State = require('../../models/masterModels/State');
+const City = require('../../model/masterModels/City')
+const State = require('../../model/masterModels/State');
 const mongoose = require('mongoose');
 
 // Fields to extract for the response

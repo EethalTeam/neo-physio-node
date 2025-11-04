@@ -5,13 +5,13 @@ const RedflagSchema = new mongoose.Schema({
 
     sourceCode: {
         type: String,
-        require: true,
-        trime: true,
+        required: true,
+        trim: true,
         unique: true
     },
     sourceName: {
         type: String,
-        require: true,
+        required: true,
         trim: true
     },
     IsperPatient: {

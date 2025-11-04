@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
- 
+
 
 
 // Define the Machinery Schema
@@ -13,35 +13,39 @@ const machineSchema = new mongoose.Schema({
     },
     machineName: {
         type: String,
-        trime: true,
-        require: true
+        trim: true,
+        required: true
     },
     machineCategoryID: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'MachineCategory',
         required: true
     },
-    Description:{
-        type:String,
-        trim:true, 
+    machineDescription: {
+        type: String,
+        trim: true,
     },
-    Manufacturer:{
-        type:String,
-        trim:true,
-        require:true
+    Manufacturer: {
+        type: String,
+        trim: true,
+        required: true
     },
-    Model:{
-        type:String,
-        trim:true,
-        require:true
+    machineModel: {
+        type: String,
+        trim: true,
+        required: true
     },
-    TotalStockCount:{
-        type:Number,
-        require:true
+    TotalStockCount: {
+        type: Number,
+        required: true
     },
-    isActive:{
-       type:Boolean,
-       default:true
+    isActive: {
+        type: Boolean,
+        default: true
+    },
+    machineNote: {
+        type: String,
+        trim: true
     }
 
 

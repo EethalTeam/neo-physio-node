@@ -9,13 +9,13 @@ const machineCategory = new mongoose.Schema({
         type:String,
         trim:true,
         unique:true,
-        require:true
+        required:true
     },
     categoryName:{
         type:String,
         trim:true,
         unique:true,
-        require:true
+        required:true
     },
     isActive:{
         type:Boolean,
