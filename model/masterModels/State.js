@@ -15,10 +15,10 @@ const StateSchema = new mongoose.Schema(
       unique: true,
       trim: true
     },
-    description: {
-      type: String,
-      trim: true,
-      maxlength: [500, 'Description cannot exceed 500 characters']
+    CountryId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Country',
+      required: true
     },
     isActive: {
       type: Boolean,

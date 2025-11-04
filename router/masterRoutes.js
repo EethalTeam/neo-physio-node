@@ -10,6 +10,9 @@ const StateControllers = require('../controllers/mastercontrollers/StateControll
 const MenuControllers = require('../controllers/mastercontrollers/MenuControllers')
 const ReferencesControllers = require('../controllers/mastercontrollers/ReferenceControllers')
 const ExpenseCategoryControllers = require('../controllers/mastercontrollers/ExpenseCategoryControllers')
+const PhysioCategoryControllers = require('../controllers/mastercontrollers/PhysioCategoryControllers')
+const LeadSourceControllers = require('../controllers/mastercontrollers/LeadSourceControllers')
+const GenderControllers = require('../controllers/mastercontrollers/GenderControllers')
 
 
 
@@ -82,5 +85,27 @@ router.post("/ExpenseCategory/getSingleExpenseCategory",ExpenseCategoryControlle
 router.post("/ExpenseCategory/updateExpenseCategory",ExpenseCategoryControllers.updateExpense)
 router.post("/ExpenseCategory/deleteExpenseCategory",ExpenseCategoryControllers.deleteExpense)
 
+
+//PhysioCategoryControllers
+router.post("/PhysioCategory/createPhysioCategory",PhysioCategoryControllers.createPhysioCategory)
+router.post("/PhysioCategory/getAllPhysioCategory",PhysioCategoryControllers.getAllPhysioCategory)
+router.post("/PhysioCategory/getSinglePhysioCategory",PhysioCategoryControllers.getPhysioCategoryByName)
+router.post("/PhysioCategory/updatePhysioCategory",PhysioCategoryControllers.updatephysioCategory)
+router.post("/PhysioCategory/deletePhysioCategory",PhysioCategoryControllers.deletePhysioCategory)
+
+//LeadSourceControllers
+router.post("/LeadSource/createLeadSource",LeadSourceControllers.createLeadSource)
+router.post("/LeadSource/getAllLeadSource",LeadSourceControllers.getAllLeadSource)
+router.post("/LeadSource/getSingleLeadSource",LeadSourceControllers.getLeadsourceByName)
+router.post("/LeadSource/updateLeadSource",LeadSourceControllers.updateLeadSource)
+router.post("/LeadSource/deleteLeadSource",LeadSourceControllers.deleteLeadSource)
+
+
+//GenderControllers
+router.post("/Gender/createGender",GenderControllers.createGender)
+router.post("/Gender/getAllGender",GenderControllers.getAllGender)
+router.post("/Gender/getSingleGender",GenderControllers.getGenderByName)
+router.post("/Gender/updateGender",GenderControllers.updateGender)
+router.post("/Gender/deleteGender",GenderControllers.deleteGender)
 
 module.exports =router
