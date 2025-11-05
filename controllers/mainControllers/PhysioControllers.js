@@ -1,8 +1,58 @@
 const Physio = require('../models/Physio');
 
+
 exports.createPhysio = async (req, res) => {
     try {
-        const newPhysio = new Physio(req.body);
+        const {
+            physioName,
+            physioGenderId,
+            physioContactNo,
+            physioSpcl,
+            physioQulifi,
+            physioExp,
+            physioPAN,
+            physioAadhar,
+            physioSalary,
+            physioProbation,
+            physioINCRDate,
+            physioPetrolAlw,
+            physioVehicleMTC,
+            physioIncentive,
+            isActive = true,
+            physioNote,
+            physioDescription
+        } = req.body;
+  
+    const lastPhysio = await Physio.findOne({}, {}, { sort: { 'createdAt': -1 } });
+    let nextPhysioNumber = 1;
+    
+    if (lastPhysio && lastPhysio.physioCode) {
+      const lastNumber = parseInt(lastPhysio.physioCode.replace('PHYSIO', ''));
+      nextPhysioNumber = isNaN(lastNumber) ? 1 : lastNumber + 1;
+    }
+    
+    const physioCode = `PHYSIO${String(nextPhysioNumber).padStart(3, '0')}`;
+    
+        const newPhysio = new Physio({
+            physioCode,
+            physioName,
+            physioGenderId,
+            physioContactNo,
+            physioSpcl,
+            physioQulifi,
+            physioExp,
+            physioPAN,
+            physioAadhar,
+            physioSalary,
+            physioProbation,
+            physioINCRDate,
+            physioPetrolAlw,
+            physioVehicleMTC,
+            physioIncentive,
+            isActive,
+            physioNote,
+            physioDescription
+        });
         
         const savedPhysio = await newPhysio.save();
         res.status(201).json(savedPhysio);

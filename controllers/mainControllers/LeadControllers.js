@@ -7,7 +7,6 @@ exports.createLead = async (req, res) => {
     try {
         const {
             leadName,
-            leadCode,
             leadAge,
             leadGenderId,
             physioCategoryId,
@@ -29,7 +28,17 @@ exports.createLead = async (req, res) => {
                 };
             });
         }
-
+  
+    const lastLead = await Lead.findOne({}, {}, { sort: { 'createdAt': -1 } });
+    let nextLeadNumber = 1;
+    
+    if (lastLead && lastLead.leadCode) {
+      const lastNumber = parseInt(lastLead.leadCode.replace('LEAD', ''));
+      nextLeadNumber = isNaN(lastNumber) ? 1 : lastNumber + 1;
+    }
+    
+    const leadCode = `LEAD${String(nextLeadNumber).padStart(3, '0')}`;
+    
         const newLead = new Lead({
             leadName,
             leadCode,
