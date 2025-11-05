@@ -10,6 +10,11 @@ const physioSChema = new mongoose.Schema({
         trim: true,
         required: true,
     },
+    physioAge: {
+        type: String,
+        trim: true,
+        required: true,
+    },
     physioGenderId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Gender'
@@ -19,7 +24,7 @@ const physioSChema = new mongoose.Schema({
         trim: true,
         required: true,
     },
-    physioSpcl: { 
+    physioSpcl: {
         type: String,
         trim: true,
         required: true,

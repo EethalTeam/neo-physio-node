@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 
-const ExpenseSchema = new mongoose.Schema({
+const ExpenseCategorySchema = new mongoose.Schema({
     ExpenseCategoryName: {
         type: String,
         trim: true,
@@ -26,8 +26,8 @@ const ExpenseSchema = new mongoose.Schema({
 
 })
 
-const ExpenseModel = mongoose.model('Expense',ExpenseSchema)
-module.exports=ExpenseModel
+const ExpenseCategoryModel = mongoose.model('ExpenseCategory',ExpenseCategorySchema)
+module.exports=ExpenseCategoryModel
 
 
 

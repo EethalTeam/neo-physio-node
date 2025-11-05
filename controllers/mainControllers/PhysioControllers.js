@@ -1,10 +1,12 @@
-const Physio = require('../models/Physio');
+const Physio = require('../../model/masterModels/Physio');
+const mongoose = require('mongoose')
 
 
 exports.createPhysio = async (req, res) => {
     try {
         const {
             physioName,
+            physioAge,
             physioGenderId,
             physioContactNo,
             physioSpcl,
@@ -35,6 +37,7 @@ exports.createPhysio = async (req, res) => {
     
         const newPhysio = new Physio({
             physioCode,
+            physioAge,
             physioName,
             physioGenderId,
             physioContactNo,
