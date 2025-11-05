@@ -16,6 +16,7 @@ const GenderControllers = require('../controllers/mastercontrollers/GenderContro
 
 
 
+
 //Machinery Category Routes
 router.post("/MachineCategory/createMachineCategory",MachineCategoryControllers.createMachineCate)
 router.post("/MachineCategory/getAllMachineCategory",MachineCategoryControllers.getAllMachCate)
@@ -107,5 +108,8 @@ router.post("/Gender/getAllGender",GenderControllers.getAllGender)
 router.post("/Gender/getSingleGender",GenderControllers.getGenderByName)
 router.post("/Gender/updateGender",GenderControllers.updateGender)
 router.post("/Gender/deleteGender",GenderControllers.deleteGender)
+
+
+
 
 module.exports =router

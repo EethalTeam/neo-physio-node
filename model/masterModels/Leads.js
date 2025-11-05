@@ -9,8 +9,8 @@ const leadSchema = new Schema({
     },
     leadCode: {
         type: String,
-        required: [true, 'Lead code is required'],
-        unique: true,
+        required: [false, 'Lead code is required'],
+        unique: false,
         trim: true
     },
     leadAge: {

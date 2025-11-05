@@ -6,7 +6,7 @@ const http = require('http');
 const { Server } = require('socket.io');
 
 const masterRoutes = require('./router/masterRoutes');
-// const mainRoutes = require('./routes/mainRoutes');
+const mainRoutes = require('./router/mainRoutes');
 // const authRoutes = require('./routes/authRoutes');
 // const Notification = require('./models/masterModels/Notifications');
 // const Group = require('./models/masterModels/Group');
@@ -43,7 +43,7 @@ app.get('/privacy', (req, res) => {
 // app.use("/webhook", webhookRoutes);
 // app.use('/api', authRoutes);
 app.use('/api', masterRoutes);
-// app.use('/api', mainRoutes);
+app.use('/api', mainRoutes);
 
 app.get('/test', (req, res) => {
   res.send("Testing mongo db url", process.env.MONGODB_URI);

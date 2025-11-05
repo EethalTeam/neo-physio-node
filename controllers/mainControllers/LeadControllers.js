@@ -1,6 +1,7 @@
-const Lead = require('../models/Lead');
+const Lead = require('../../model/masterModels/Leads');
 const fs = require('fs');
 const path = require('path');
+const mongoose = require('mongoose')
 
 exports.createLead = async (req, res) => {
     try {
@@ -23,7 +24,7 @@ exports.createLead = async (req, res) => {
             leadDocuments = req.files.map(file => {
                 return {
                     fileName: file.originalname,
-                    fileUrl: `/uploads/leads/${file.filename}`, 
+                    fileUrl: `/uploads/leads/${file.filename}`,
                     fileType: file.mimetype
                 };
             });
@@ -40,7 +41,7 @@ exports.createLead = async (req, res) => {
             leadMedicalHistory,
             leadAddress,
             isQualified: isQualified || false,
-            leadDocuments 
+            leadDocuments
         });
 
         const savedLead = await newLead.save();
@@ -48,7 +49,7 @@ exports.createLead = async (req, res) => {
 
     } catch (error) {
         if (error.code === 11000) {
-             return res.status(400).json({ message: 'Lead code already exists.' });
+            return res.status(400).json({ message: 'Lead code already exists.' });
         }
         res.status(500).json({ message: error.message });
     }
@@ -61,10 +62,10 @@ exports.getAllLeads = async (req, res) => {
         const skip = (page - 1) * limit;
 
         const leads = await Lead.find()
-            .populate('leadGenderId leadSourceId physioCategoryId') 
+            .populate('leadGenderId leadSourceId physioCategoryId')
             .skip(skip)
             .limit(limit)
-            .sort({ createdAt: -1 }); 
+            .sort({ createdAt: -1 });
 
         const totalLeads = await Lead.countDocuments();
 
@@ -98,10 +99,38 @@ exports.getLeadById = async (req, res) => {
 
 exports.updateLead = async (req, res) => {
     try {
-        const leadId = req.params.id;
-        const updateData = req.body;
+        const { leadId, leadName,
+                    leadCode,
+                    leadAge,
+                    leadGenderId,
+                    physioCategoryId,
+                    leadContactNo,
+                    leadSourceId,
+                    leadMedicalHistory,
+                    leadAddress,
+                    isQualified,
+                    leadDocuments } = req.body;
 
-        const lead = await Lead.findById(leadId);
+        const lead = await Lead.findByIdAndUpdate(
+            leadId,
+            {
+                $set:
+                {
+                    leadName,
+                    leadCode,
+                    leadAge,
+                    leadGenderId,
+                    physioCategoryId,
+                    leadContactNo,
+                    leadSourceId,
+                    leadMedicalHistory,
+                    leadAddress,
+                    isQualified: isQualified || false,
+                    leadDocuments
+                }
+
+            },
+            { new: true, runValidators: true });
 
         if (!lead) {
             return res.status(404).json({ message: 'Lead not found' });
@@ -113,19 +142,11 @@ exports.updateLead = async (req, res) => {
                 fileUrl: `/uploads/leads/${file.filename}`,
                 fileType: file.mimetype
             }));
-            
-            lead.leadDocuments.push(...newDocuments); 
+
+            lead.leadDocuments.push(...newDocuments);
         }
-
-        Object.assign(lead, updateData);
-        
-        if (updateData.isQualified !== undefined) {
-             lead.isQualified = updateData.isQualified === 'true' || updateData.isQualified === true;
-        }
-
-        const updatedLead = await lead.save();
-
-        res.status(200).json(updatedLead);
+         await lead.save();
+        res.status(200).json(lead);
 
     } catch (error) {
         res.status(500).json({ message: error.message });
@@ -134,26 +155,33 @@ exports.updateLead = async (req, res) => {
 
 exports.deleteLead = async (req, res) => {
     try {
-        const lead = await Lead.findById(req.params.id);
+        const { _id } = req.body;
+
+        if (!mongoose.Types.ObjectId.isValid(_id)) {
+            return res.status(400).json({ message: 'Invalid ID' });
+        }
+
+
+        const lead = await Lead.findByIdAndDelete(_id);
 
         if (!lead) {
             return res.status(44).json({ message: 'Lead not found' });
         }
 
-        if (lead.leadDocuments && lead.leadDocuments.length > 0) {
-            lead.leadDocuments.forEach(doc => {
-                // 'doc.fileUrl' is like '/uploads/leads/filename.pdf'
-                const filePath = path.join(__dirname, '..', doc.fileUrl); 
-                
-                fs.unlink(filePath, (err) => {
-                    if (err) {
-                        console.error(`Failed to delete file: ${filePath}`, err);
-                    }
-                });
-            });
-        }
+        // if (lead.leadDocuments && lead.leadDocuments.length > 0) {
+        //     lead.leadDocuments.forEach(doc => {
+        //         // 'doc.fileUrl' is like '/uploads/leads/filename.pdf'
+        //         const filePath = path.join(__dirname, '..', doc.fileUrl);
 
-        await lead.deleteOne(); 
+        //         fs.unlink(filePath, (err) => {
+        //             if (err) {
+        //                 console.error(`Failed to delete file: ${filePath}`, err);
+        //             }
+        //         });
+        //     });
+        // }
+
+        // await lead.deleteOne();
 
         res.status(200).json({ message: 'Lead deleted successfully' });
 
