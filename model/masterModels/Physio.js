@@ -1,95 +1,95 @@
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
 const physioSChema = new mongoose.Schema({
-
     physioCode: {
         type: String,
         trim: true,
-        require: true,
+        required: true,
         unique: true
     },
     physioName: {
         type: String,
         trim: true,
-        require: true,
+        required: true,
+    },
+    physioGenderId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Gender'
     },
     physioContactNo: {
-        type: true,
+        type: String,
         trim: true,
-        require: true,
+        required: true,
     },
-    physioSpcl: {
-        type: true,
+    physioSpcl: { 
+        type: String,
         trim: true,
-        require: true,
+        required: true,
     },
-
     physioQulifi: {
-        type: true,
+        type: String,
         trim: true,
-        require: true,
+        required: true,
     },
-
     physioExp: {
-        type: true,
+        type: String,
         trim: true,
-        require: true,
+        required: true,
     },
-    physioPan: {
-        type: true,
+    physioPAN: {
+        type: String,
         trim: true,
-        require: true,
+        required: true,
     },
     physioAadhar: {
-        type: true,
+        type: String,
         trim: true,
-        require: true,
+        required: true,
     },
     physioSalary: {
         type: Number,
-        require: true,
+        required: true,
         trim: true
     },
     physioProbation: {
         type: Number,
-        require: true,
+        required: true,
         trim: true
     },
-    physioINCR: {
+    physioINCRDate: {
         type: Date,
-        require: true
+        required: true
     },
     physioPetrolAlw: {
         type: Number,
-        require: true,
+        required: true,
         trim: true
     },
     physioVehicleMTC: {
         type: Number,
-        require: true,
+        required: true,
         trim: true
     },
     physioIncentive: {
         type: Number,
-        require: true,
+        required: true,
         trim: true
     },
     isActive: {
         type: Boolean,
         default: true
     },
-    physioNote:{
-        type:String,
-        trim:true
+    physioNote: {
+        type: String,
+        trim: true
     },
-    physioDescription:{
-        type:String,
-        trim:true
+    physioDescription: {
+        type: String,
+        trim: true
     }
+}, {
+    timestamps: true
+});
 
-
-
-})
-
-const physioModel = mongoose.model('Physio', physioSChema)
-module.exports = physioModel
+const Physio = mongoose.model('Physio', physioSChema);
+module.exports = Physio;

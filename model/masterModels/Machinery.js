@@ -9,7 +9,7 @@ const machineSchema = new mongoose.Schema({
         type: String,
         trim: true,
         unique: true,
-        require: true
+        required: true
     },
     machineName: {
         type: String,
