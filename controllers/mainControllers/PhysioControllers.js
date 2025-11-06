@@ -20,7 +20,7 @@ exports.createPhysio = async (req, res) => {
             physioPetrolAlw,
             physioVehicleMTC,
             physioIncentive,
-            isActive = true,
+            isActive,
             physioNote,
             physioDescription
         } = req.body;
@@ -77,7 +77,7 @@ exports.getAllPhysios = async (req, res) => {
         const limit = parseInt(req.body.limit) || 10;
         const skip = (page - 1) * limit;
 
-        const physios = await Physio.find({ isActive: true }) 
+        const physios = await Physio.find({}) 
             .populate('physioGenderId')
             .skip(skip)
             .limit(limit)
@@ -134,6 +134,7 @@ exports.updatePhysio = async (req, res) => {
         const updatedPhysio = await Physio.findByIdAndUpdate(
             _id,
             updateData,
+     
             { new: true, runValidators: true } 
         );
 
@@ -158,7 +159,7 @@ exports.deletePhysio = async (req, res) => {
     try {
         
         const { _id } = req.body;
-        if (!id) {
+        if (!_id) {
             return res.status(400).json({ message: 'Physio ID is required in the body.' });
         }
 
