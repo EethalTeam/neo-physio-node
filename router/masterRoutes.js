@@ -13,6 +13,7 @@ const ExpenseCategoryControllers = require('../controllers/mastercontrollers/Exp
 const PhysioCategoryControllers = require('../controllers/mastercontrollers/PhysioCategoryControllers')
 const LeadSourceControllers = require('../controllers/mastercontrollers/LeadSourceControllers')
 const GenderControllers = require('../controllers/mastercontrollers/GenderControllers')
+const RiskFactorControllers = require('../controllers/mastercontrollers/RiskFactorControllers')
 
 
 
@@ -108,6 +109,13 @@ router.post("/Gender/getAllGender",GenderControllers.getAllGender)
 router.post("/Gender/getSingleGender",GenderControllers.getGenderByName)
 router.post("/Gender/updateGender",GenderControllers.updateGender)
 router.post("/Gender/deleteGender",GenderControllers.deleteGender)
+
+//RiskFactorControllers
+router.post("/RiskFactor/createRiskFactor",RiskFactorControllers.createRiskFactor)
+router.post("/RiskFactor/getAllRiskFactor",RiskFactorControllers.getAllRiskFactor)
+router.post("/RiskFactor/getSingleRiskFactor",RiskFactorControllers.getByRiskFactorName)
+router.post("/RiskFactor/updateRiskFactor",RiskFactorControllers.updateRiskFactor)
+router.post("/RiskFactor/deleteRiskFactor",RiskFactorControllers.deleteRiskFactor)
 
 
 

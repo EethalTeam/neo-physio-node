@@ -1,23 +1,38 @@
 const mongoose = require('mongoose')
 
+
+const RiskFactorSubSchema = new mongoose.Schema({
+    RiskFactorID: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'RiskFactor',
+        required: true
+    },
+    isExist: {
+        type: Boolean,
+        default: false
+    }
+}, { _id: false })
+
+
+
 const patientSchema = new mongoose.Schema({
     patientCode: {
         type: String,
-        trim: true,
+        trim: true
 
     },
     patientName: {
         type: String,
-        trim: true,
+        trim: true
 
     },
     consultationDate: {
-        type: Date,
+        type: Date
 
     },
     patientAge: {
         type: Number,
-        trim: true,
+        trim: true
 
     },
     patientGenderId: {
@@ -27,7 +42,7 @@ const patientSchema = new mongoose.Schema({
     },
     byStandar: {
         type: String,
-        trim: true,
+        trim: true
 
     },
     Relation: {
@@ -56,46 +71,20 @@ const patientSchema = new mongoose.Schema({
     },
     patientCondition: {
         type: String,
-        trim: true,
+        trim: true
 
     },
     physioId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Physio',
+        ref: 'Physio'
 
     },
     reviewDate: {
-        type: Date,
+        type: Date
 
     },
-    isDiabetic: {
-        type: Boolean,
-        default: false
-    },
-    isTrauma: {
-        type: Boolean,
-        default: false
-    },
-    isHistoryofSurgery: {
-        type: Boolean,
-        default: false
-    },
-    isHistoryofFall: {
-        type: Boolean,
-        default: false
-    },
-    isHypertension: {
-        type: Boolean,
-        default: false
-    },
-    isOsteoporosis: {
-        type: Boolean,
-        default: false
-    },
-    isArthritis: {
-        type: Boolean,
-        default: false
-    },
+    MedicalHistoryAndRiskFactor: [RiskFactorSubSchema],
+
     otherMedCon: {
         type: String,
         trim: true,
@@ -103,7 +92,7 @@ const patientSchema = new mongoose.Schema({
     },
     currMed: {
         type: String,
-        trim: true,
+        trim: true
 
     },
     typesOfLifeStyle: {
@@ -189,6 +178,52 @@ const patientSchema = new mongoose.Schema({
     hodNotes: {
         type: String,
         trim: true
+    },
+    Physiotherapist: {
+        type: String,
+        trim: true
+    },
+    sessionStartDate: {
+        type: Date,
+        trim: true
+    },
+
+    sessionTime: {
+        type: String,
+        trim: true
+    },
+    totalSessionDays: {
+        type: Number,
+        trim: true
+    },
+    InitialShorttermGoal: {
+        type: String,
+        trim: true
+    },
+    goalDuration: {
+        type: Number,
+        trim: true
+    },
+    visitOrder: {
+        type: Number,
+        trim: true
+    },
+    KmsfromHub: {
+        type: Number,
+        trim: true
+    },
+    KmsfLPatienttoHub: {
+        type: Number,
+        trim: true
+    },
+    Feedback: {
+        type: String,
+        trim: true
+    },
+    Satisfaction: {
+        type: Number,
+        min: 0,
+        max: 100
     }
 
 
