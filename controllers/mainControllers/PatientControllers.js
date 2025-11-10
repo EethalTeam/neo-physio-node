@@ -11,14 +11,8 @@ exports.createPatients = async (req, res) => {
              longTermGoals,RecomTherapy,Frequency,Duration,noOfDays,Modalities,targetedArea,hodNotes,Physiotherapist,sessionStartDate,sessionTime,
              totalSessionDays,InitialShorttermGoal,goalDuration,visitOrder,KmsfromHub,KmsfLPatienttoHub,Feedback,Satisfaction
             } = req.body;
-
         // Check for duplicates (if needed)
-        const existingPatient = await Patient.findOne({ 
-            $or: [
-            
-                { patientCode }
-            ] 
-        });
+        const existingPatient = await Patient.findOne({patientCode:patientCode});
         if (existingPatient) {
             return res.status(400).json({ message: 'Patient with this code  already exists' });
         }
@@ -47,7 +41,7 @@ exports.createPatients = async (req, res) => {
 // Get all Patient
 exports.getAllPatients = async (req, res) => {
     try {
-       const Patients = await Patient.find()
+       const Patients = await Patient.find().populate("patientGenderId", "genderName")
         if(!Patients){
             res.status(400).json({message:"patients is not found"})
         }
