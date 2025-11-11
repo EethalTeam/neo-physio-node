@@ -74,7 +74,7 @@ router.post('/Menu/getFormattedMenu', MenuControllers.getFormattedMenu)
 
 //ReferencesControllers
 router.post("/References/createReferences",ReferencesControllers.createReference)
-router.post("/References/getALlReferences",ReferencesControllers.getAllReference)
+router.post("/References/getALLReferences",ReferencesControllers.getAllReference)
 router.post("/References/getSingleReferences",ReferencesControllers.getSingleReference)
 router.post("/References/updateReferences",ReferencesControllers.updateReferences)
 router.post("/References/deleteReferences",ReferencesControllers.deleteReferences)

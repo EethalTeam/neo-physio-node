@@ -1,13 +1,12 @@
 const mongoose = require('mongoose');
 
 // Define the Reference Schema
-const RedflagSchema = new mongoose.Schema({
+const ReferenceSchema = new mongoose.Schema({
 
     sourceCode: {
         type: String,
-        required: true,
         trim: true,
-        unique: true
+   
     },
     sourceName: {
         type: String,
@@ -41,5 +40,5 @@ const RedflagSchema = new mongoose.Schema({
   
 })
 
-const Reference = mongoose.model('Reference',RedflagSchema )
+const Reference = mongoose.model('Reference',ReferenceSchema )
 module.exports = Reference
