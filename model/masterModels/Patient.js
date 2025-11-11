@@ -98,7 +98,6 @@ const patientSchema = new mongoose.Schema({
     typesOfLifeStyle: {
         type: String,
         trim: true,
-
     },
     smokingOrAlcohol: {
         type: Boolean,
@@ -216,6 +215,10 @@ const patientSchema = new mongoose.Schema({
         type: Number,
         trim: true
     },
+    kmsFromPrevious:{
+        type:Number,
+        trim:true
+    },
     Feedback: {
         type: String,
         trim: true
@@ -224,7 +227,32 @@ const patientSchema = new mongoose.Schema({
         type: Number,
         min: 0,
         max: 100
+    },
+    historyOfFall:{
+        type:Boolean,
+        default:false
+    },
+    historyOfSurgery:{
+         type:Boolean,
+        default:false
+    },
+    historyOfSurgeryDetails:{
+        type:String,
+        trim:true
+
+    },
+    historyOfFallDetails:{
+        type:String,
+        trim:true
+
+    },
+    reviewFrequency:{
+        type:Number,
+        trim:true
+
     }
+
+    
 
 
 })

@@ -4,12 +4,12 @@ const Patient = require('../../model/masterModels/Patient')
 // Create a new Patient
 exports.createPatients = async (req, res) => {
     try {
-        const { patientName, patientCode, isActive ,consultationDate ,
+        const { patientName, patientCode, isActive ,consultationDate ,historyOfFall,historyOfSurgery,historyOfSurgeryDetails,historyOfFallDetails,
              patientAge ,patientGenderId ,byStandar ,Relation,patientNumber,patientAltNum ,patientAddress ,patientPinCode,patientCondition,physioId,
              reviewDate,MedicalHistoryAndRiskFactor,otherMedCon,currMed,typesOfLifeStyle,smokingOrAlcohol,dietaryHabits,Contraindications
              ,painLevel,rangeOfMotion,muscleStrength,postureOrGaitAnalysis,functionalLimitations,ADLAbility,shortTermGoals,
              longTermGoals,RecomTherapy,Frequency,Duration,noOfDays,Modalities,targetedArea,hodNotes,Physiotherapist,sessionStartDate,sessionTime,
-             totalSessionDays,InitialShorttermGoal,goalDuration,visitOrder,KmsfromHub,KmsfLPatienttoHub,Feedback,Satisfaction
+             totalSessionDays,InitialShorttermGoal,goalDuration,visitOrder,KmsfromHub,KmsfLPatienttoHub,Feedback,Satisfaction,kmsFromPrevious,reviewFrequency
             } = req.body;
         // Check for duplicates (if needed)
         const existingPatient = await Patient.findOne({patientCode:patientCode});
@@ -18,12 +18,12 @@ exports.createPatients = async (req, res) => {
         }
         // Create and save the Patient
         const patients = new Patient({
-            patientName, patientCode, isActive ,consultationDate ,
+            patientName, patientCode, isActive ,consultationDate ,historyOfFall,historyOfSurgery,historyOfSurgeryDetails,historyOfFallDetails,
              patientAge ,patientGenderId ,byStandar ,Relation,patientNumber,patientAltNum ,patientAddress ,patientPinCode,patientCondition,physioId,
              reviewDate,MedicalHistoryAndRiskFactor,otherMedCon,currMed,typesOfLifeStyle,smokingOrAlcohol,dietaryHabits,Contraindications
              ,painLevel,rangeOfMotion,muscleStrength,postureOrGaitAnalysis,functionalLimitations,ADLAbility,shortTermGoals,
              longTermGoals,RecomTherapy,Frequency,Duration,noOfDays,Modalities,targetedArea,hodNotes,Physiotherapist,sessionStartDate,sessionTime,
-             totalSessionDays,InitialShorttermGoal,goalDuration,visitOrder,KmsfromHub,KmsfLPatienttoHub,Feedback,Satisfaction
+             totalSessionDays,InitialShorttermGoal,goalDuration,visitOrder,KmsfromHub,KmsfLPatienttoHub,Feedback,Satisfaction,kmsFromPrevious,reviewFrequency
             });
         await patients.save();
 
@@ -41,7 +41,7 @@ exports.createPatients = async (req, res) => {
 // Get all Patient
 exports.getAllPatients = async (req, res) => {
     try {
-       const Patients = await Patient.find().populate("patientGenderId", "genderName")
+       const Patients = await Patient.find().populate("patientGenderId", "genderName").populate("MedicalHistoryAndRiskFactor.RiskFactorID","RiskFactorName").populate("physioId","physioName")
         if(!Patients){
             res.status(400).json({message:"patients is not found"})
         }
@@ -74,23 +74,23 @@ exports.getByPatientsName = async (req, res) => {
 // Update a Patients
 exports.updatePatients= async (req, res) => {
     try {
-           const { PatientIDPK, patientName, patientCode, isActive ,consultationDate ,
+           const { _id, patientName, patientCode, isActive ,consultationDate ,historyOfFall,historyOfSurgery,historyOfSurgeryDetails,historyOfFallDetails,
              patientAge ,patientGenderId ,byStandar ,Relation,patientNumber,patientAltNum ,patientAddress ,patientPinCode,patientCondition,physioId,
              reviewDate,MedicalHistoryAndRiskFactor,otherMedCon,currMed,typesOfLifeStyle,smokingOrAlcohol,dietaryHabits,Contraindications
              ,painLevel,rangeOfMotion,muscleStrength,postureOrGaitAnalysis,functionalLimitations,ADLAbility,shortTermGoals,
              longTermGoals,RecomTherapy,Frequency,Duration,noOfDays,Modalities,targetedArea,hodNotes,Physiotherapist,sessionStartDate,sessionTime,
-             totalSessionDays,InitialShorttermGoal,goalDuration,visitOrder,KmsfromHub,KmsfLPatienttoHub,Feedback,Satisfaction
+             totalSessionDays,InitialShorttermGoal,goalDuration,visitOrder,KmsfromHub,KmsfLPatienttoHub,Feedback,Satisfaction,kmsFromPrevious,reviewFrequency
             } = req.body;
 
         const Patients = await Patient.findByIdAndUpdate(
-            PatientIDPK,
+            _id,
             { $set:{
-              patientName, patientCode, isActive ,consultationDate ,
+              patientName, patientCode, isActive ,consultationDate ,historyOfFall,historyOfSurgery,historyOfSurgeryDetails,historyOfFallDetails,
              patientAge ,patientGenderId ,byStandar ,Relation,patientNumber,patientAltNum ,patientAddress ,patientPinCode,patientCondition,physioId,
              reviewDate,MedicalHistoryAndRiskFactor,otherMedCon,currMed,typesOfLifeStyle,smokingOrAlcohol,dietaryHabits,Contraindications
              ,painLevel,rangeOfMotion,muscleStrength,postureOrGaitAnalysis,functionalLimitations,ADLAbility,shortTermGoals,
              longTermGoals,RecomTherapy,Frequency,Duration,noOfDays,Modalities,targetedArea,hodNotes,Physiotherapist,sessionStartDate,sessionTime,
-             totalSessionDays,InitialShorttermGoal,goalDuration,visitOrder,KmsfromHub,KmsfLPatienttoHub,Feedback,Satisfaction
+             totalSessionDays,InitialShorttermGoal,goalDuration,visitOrder,KmsfromHub,KmsfLPatienttoHub,Feedback,Satisfaction,kmsFromPrevious,reviewFrequency
             }},
             { new: true, runValidators: true }
         );
