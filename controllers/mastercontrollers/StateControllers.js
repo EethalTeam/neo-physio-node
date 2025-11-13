@@ -38,10 +38,10 @@ exports.getAllStates = async (req, res) => {
     try {
         //option 1 aggregate method
          
-         const {CountryID} = req.body
+         const {CountryId} = req.body
         let filter={}
-        if(CountryID){
-            filter.CountryID=new mongoose.Types.ObjectId(CountryID)
+        if(CountryId){
+            filter.CountryId=new mongoose.Types.ObjectId(CountryId)
         }
 
         const state= await State.aggregate([
@@ -97,10 +97,10 @@ exports.getStateByName = async (req, res) => {
 // Update a State
 exports.updateState = async (req, res) => {
     try {
-        const {StateIDPK,StateCode,StateName,isActive} = {...req.body};
+        const {StateIDPK,StateCode,StateName,isActive,CountryId} = {...req.body};
         const state = await State.findByIdAndUpdate(
             StateIDPK,
-            { $set:{StateCode,StateName,isActive}},
+            { $set:{StateCode,StateName,CountryId,isActive}},
             { new: true, runValidators: true }
         );
 

@@ -28,5 +28,9 @@ router.post("/Patient/updatePatient",PatientControllers.updatePatients)
 router.post("/Patient/deletePatient",PatientControllers.deletePatients)
 
 
+//Assign Physio
+router.post('/Patient/AssignPhysio',PatientControllers.AssignPhysio)
+
+
 
 module.exports =router;

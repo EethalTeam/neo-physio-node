@@ -250,6 +250,10 @@ const patientSchema = new mongoose.Schema({
         type:Number,
         trim:true
 
+    },
+    goalDescription:{
+        type:String,
+        trim:true
     }
 
     
