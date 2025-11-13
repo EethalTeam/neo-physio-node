@@ -13,6 +13,6 @@ const RiskFactorSchema = new mongoose.Schema({
        type: Boolean,
       default: true
   }
-})
+},{timestamps:true})
 const RiskFactorModel = mongoose.model('RiskFactor',RiskFactorSchema)
 module.exports=RiskFactorModel

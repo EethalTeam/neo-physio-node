@@ -8,16 +8,16 @@ exports.createMachineCate = async (req,res) =>{
     try {
         const {categoryCode,categoryName,isActive}=req.body
 
-         const existingMachineCate = await Category.findOne({ 
-            $or: [
-                { categoryCode }, 
-                { categoryName }
+        //  const existingMachineCate = await Category.findOne({ 
+        //     $or: [
+        //         { categoryCode }, 
+        //         { categoryName }
                 
-            ] 
-        });
-        if (existingMachineCate) {
-            return res.status(400).json({ message: 'MachineCategory  with this code or name already exists' });
-        }
+        //     ] 
+        // });
+        // if (existingMachineCate) {
+        //     return res.status(400).json({ message: 'MachineCategory  with this code or name already exists' });
+        // }
 
         const Machcate = new Category({categoryCode, categoryName , isActive })
         await Machcate.save()
@@ -97,7 +97,7 @@ exports.deleteMachCate = async (req, res) => {
             return res.status(400).json({ message: 'Invalid ID' });
         }
         
-        const Machcate = await Country.findByIdAndDelete(_id);
+        const Machcate = await Category.findByIdAndDelete(_id);
 
         if (!Machcate) {
             return res.status(400).json({ message: 'MachineCategory not found' });

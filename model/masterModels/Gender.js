@@ -23,6 +23,6 @@ const genderSchema = new mongoose.Schema({
     }
 
 
-})
+},{timestamps:true})
 const genderModel = mongoose.model('Gender',genderSchema)
 module.exports=genderModel

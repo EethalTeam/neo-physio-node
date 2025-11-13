@@ -23,6 +23,6 @@ const leadSchema = new mongoose.Schema({
     }
 
 
-})
+},{timestamps:true})
 const LeadModel = mongoose.model('LeadSource',leadSchema)
 module.exports=LeadModel;

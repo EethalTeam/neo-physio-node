@@ -7,24 +7,33 @@ const Reference = require("../../model/masterModels/Reference")
 exports.createReference = async(req,res) => {
 try {
     const {
-    sourceCode,sourceName,IsperPatient,IsperSession,Ispercentage,Isrupees,CommissionPercentage,commissionAmount
+     sourceName, commissionCategory,commissionType, CommissionPercentage,commissionAmount
 } = req.body
 
 
-// Check for duplicates (if needed)
-const exitingReference = await Reference.findOne({
-    $or:[
-        {sourceCode},
-        {sourceName}
-    ]
-})
+// // Check for duplicates (if needed)
+// const exitingReference = await Reference.findOne({
+//     $or:[
+        
+//         {sourceCode}
+//     ]
+// })
 
-if(exitingReference){
-    return   res.status(400).json({ message: 'Reference with this code or name already exists' });
-}
+// if(exitingReference){
+//     return   res.status(400).json({ message: 'Reference with this code or name already exists' });
+
+ const lastReference = await Reference.findOne({}, {}, { sort: { 'createdAt': -1 } });
+    let nextReferenceNumber = 1;
+    
+    if (lastReference && lastReference.sourceCode) {
+      const lastNumber = parseInt(lastReference.sourceCode.replace('REFERENCE', ''));
+      nextReferenceNumber = isNaN(lastNumber) ? 1 : lastNumber + 1;
+    }
+    
+    const sourceCode = `REFERENCE${String(nextReferenceNumber).padStart(3, '0')}`;
  
 const Refer = new Reference({
-    sourceCode,sourceName,IsperPatient,IsperSession,Ispercentage,Isrupees,CommissionPercentage,commissionAmount
+    sourceCode,sourceName,commissionCategory,commissionType,CommissionPercentage,commissionAmount
 })
 await Refer.save()
 res.status(200).json({message:"References Create successfully",data:Refer._id})
@@ -74,11 +83,11 @@ exports.updateReferences = async (req,res) => {
     try {
            
         const {
-            Refer_id,sourceCode,sourceName,IsperPatient,IsperSession,Ispercentage,Isrupees,CommissionPercentage,commissionAmount
+            _id,sourceCode,sourceName, commissionCategory,commissionType,CommissionPercentage,commissionAmount
         } = req.body
 
-        const Refer = await Reference.findByIdAndUpdate(Refer_id,{
-            $set:{sourceCode,sourceName,IsperPatient,IsperSession,Ispercentage,Isrupees,CommissionPercentage,commissionAmount}
+        const Refer = await Reference.findByIdAndUpdate(_id,{
+            $set:{sourceCode,sourceName, commissionCategory,commissionType,CommissionPercentage,commissionAmount}
         },{new:true,runValidators:true})
 
         if(!Refer){

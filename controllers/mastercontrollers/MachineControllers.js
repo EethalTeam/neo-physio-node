@@ -7,7 +7,7 @@ exports.createMachine = async (req,res) =>{
      
     try {
         const {
-        machineCode,
+         
         machineName,
         machineCategoryID,
         machineDescription,
@@ -20,14 +20,24 @@ exports.createMachine = async (req,res) =>{
 
      const existingMachine = await Machine.findOne({
         $or :[
-            {machineCode},
+         
             {machineName}, 
             
         ]
      })
       if (existingMachine) {
-            return res.status(400).json({ message: 'Machine with this code or name already exists' });
+            return res.status(400).json({ message: 'Machine with this name already exists' });
         }
+
+     const lastMachine = await Machine.findOne({}, {}, { sort: { 'createdAt': -1 } });
+    let nextMachineNumber = 1;
+    
+    if (lastMachine && lastMachine.machineCode) {
+      const lastNumber = parseInt(lastMachine.machineCode.replace('MACHINE', ''));
+      nextMachineNumber = isNaN(lastNumber) ? 1 : lastNumber + 1;
+    }
+    
+    const machineCode = `MACHINE${String(nextMachineNumber).padStart(3, '0')}`;
 
          const Machines = new Machine({
          machineCode,  machineName, machineCategoryID,machineDescription,Manufacturer, machineModel,TotalStockCount,isActive, machineNote
@@ -80,11 +90,11 @@ exports.getMachineByName = async (req, res) => {
 exports.updateMaachine = async (req,res) => {
     try {
         const {
-        machineId,  machineCode,  machineName, machineCategoryID,machineDescription,Manufacturer, machineModel,TotalStockCount,isActive, machineNote
+        _id,  machineCode,  machineName, machineCategoryID,machineDescription,Manufacturer, machineModel,TotalStockCount,isActive, machineNote
         } = req.body
 
         const Machines = await Machine.findByIdAndUpdate(
-        machineId,
+        _id,
         {$set:{machineCode,  machineName, machineCategoryID,machineDescription,Manufacturer, machineModel,TotalStockCount,isActive, machineNote}},
         {new:true, runValidators:true}
     )

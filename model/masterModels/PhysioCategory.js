@@ -22,6 +22,6 @@ const PhysioCategorySchema = new mongoose.Schema({
     }
 
 
-})
+},{timestamps:true})
 const PhysioCategory = mongoose.model('PhysioCategory',PhysioCategorySchema)
 module.exports=PhysioCategory

@@ -8,18 +8,18 @@ const machineSchema = new mongoose.Schema({
     machineCode: {
         type: String,
         trim: true,
-        unique: true,
-        required: true
+        
+       
     },
     machineName: {
         type: String,
         trim: true,
-        required: true
+      
     },
     machineCategoryID: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'MachineCategory',
-        required: true
+     
     },
     machineDescription: {
         type: String,
@@ -28,16 +28,16 @@ const machineSchema = new mongoose.Schema({
     Manufacturer: {
         type: String,
         trim: true,
-        required: true
+      
     },
     machineModel: {
         type: String,
         trim: true,
-        required: true
+     
     },
     TotalStockCount: {
-        type: Number,
-        required: true
+        type: Number, 
+            trim: true,
     },
     isActive: {
         type: Boolean,
@@ -49,6 +49,7 @@ const machineSchema = new mongoose.Schema({
     }
 
 
-})
+}
+,{timestamps:true})
 const Machine = mongoose.model('Machine', machineSchema)
 module.exports = Machine

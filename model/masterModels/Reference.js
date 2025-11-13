@@ -13,21 +13,13 @@ const ReferenceSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
-    IsperPatient: {
-        type: Boolean,
-        default: false,
+    commissionCategory:{
+        type:String,
+        trim:true
     },
-    IsperSession:{
-         type: Boolean,
-         default: false
-    },
-    Ispercentage:{
-        type: Boolean,
-        default: false
-    },
-    Isrupees:{
-       type: Boolean,
-       default: false
+    commissionType:{
+        type:String,
+        trim:true
     },
     CommissionPercentage:{
           type:Number,
@@ -38,7 +30,7 @@ const ReferenceSchema = new mongoose.Schema({
           trim:true
     },
   
-})
+},{timestamps:true})
 
 const Reference = mongoose.model('Reference',ReferenceSchema )
 module.exports = Reference

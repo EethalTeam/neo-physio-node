@@ -24,7 +24,7 @@ const ExpenseCategorySchema = new mongoose.Schema({
         default: true
     }
 
-})
+},{timestamps:true})
 
 const ExpenseCategoryModel = mongoose.model('ExpenseCategory',ExpenseCategorySchema)
 module.exports=ExpenseCategoryModel
