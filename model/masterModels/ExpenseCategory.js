@@ -5,7 +5,7 @@ const ExpenseCategorySchema = new mongoose.Schema({
         type: String,
         trim: true,
         required: true,
-          unique:true
+         
     },
     ExpenseCategoryType: {
         type: String,
@@ -16,7 +16,7 @@ const ExpenseCategorySchema = new mongoose.Schema({
         type: String,
         trim: true,
         required: true,
-        unique:true
+     
     },
 
     isActive: {

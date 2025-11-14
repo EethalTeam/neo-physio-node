@@ -14,6 +14,7 @@ const PhysioCategoryControllers = require('../controllers/mastercontrollers/Phys
 const LeadSourceControllers = require('../controllers/mastercontrollers/LeadSourceControllers')
 const GenderControllers = require('../controllers/mastercontrollers/GenderControllers')
 const RiskFactorControllers = require('../controllers/mastercontrollers/RiskFactorControllers')
+const ExpenseTypeController = require('../controllers/mastercontrollers/ExpenseTypeControllers')
 
 
 
@@ -81,11 +82,19 @@ router.post("/References/deleteReferences",ReferencesControllers.deleteReference
 
 
 //ExpenseCategoryControllers 
-router.post("/ExpenseCategory/createExpenseCategory",ExpenseCategoryControllers.createExpense)
-router.post("/ExpenseCategory/getAllExpenseCategory",ExpenseCategoryControllers.getAllExpenses)
+router.post("/ExpenseCategory/createExpenseCategory",ExpenseCategoryControllers.createExpenseCategory)
+router.post("/ExpenseCategory/getAllExpenseCategory",ExpenseCategoryControllers.getAllExpensesCategory)
 router.post("/ExpenseCategory/getSingleExpenseCategory",ExpenseCategoryControllers.getExpenseCategoryByName)
-router.post("/ExpenseCategory/updateExpenseCategory",ExpenseCategoryControllers.updateExpense)
-router.post("/ExpenseCategory/deleteExpenseCategory",ExpenseCategoryControllers.deleteExpense)
+router.post("/ExpenseCategory/updateExpenseCategory",ExpenseCategoryControllers.updateExpenseCategory)
+router.post("/ExpenseCategory/deleteExpenseCategory",ExpenseCategoryControllers.deleteExpenseCategory)
+
+
+//ExpenseType
+router.post('/ExpenseType/createExpenseType',ExpenseTypeController.createExpenseType)
+router.post('/ExpenseType/getAllExpenseType',ExpenseTypeController.getAllExpensesType)
+router.post('/ExpenseType/getSingleExpenseType',ExpenseTypeController.getExpenseTypeByName)
+router.post('/ExpenseType/updateExpenseType',ExpenseTypeController.updateExpenseType)
+router.post('/ExpenseType/deleteExpenseType',ExpenseTypeController.deleteExpenseType)
 
 
 //PhysioCategoryControllers

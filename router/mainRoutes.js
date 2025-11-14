@@ -4,6 +4,7 @@ const router = express.Router()
 const LeadControllers = require("../controllers/maincontrollers/LeadControllers")
 const physioControllers = require("../controllers/maincontrollers/PhysioControllers")
 const PatientControllers = require('../controllers/maincontrollers/PatientControllers')
+const ExpenseControllers = require('../controllers/maincontrollers/ExpenseControllers')
 
 
 //Leads
@@ -30,6 +31,13 @@ router.post("/Patient/deletePatient",PatientControllers.deletePatients)
 
 //Assign Physio
 router.post('/Patient/AssignPhysio',PatientControllers.AssignPhysio)
+
+//ExpenseControllers
+router.post('/Expense/createExpense',ExpenseControllers.createExpense)
+router.post('/Expense/getAllExpense',ExpenseControllers.getAllExpense)
+router.post('/Expense/getSingleExpense',ExpenseControllers.getSingleExpense)
+router.post('/Expense/updateExpense',ExpenseControllers.updateExpense)
+router.post('/Expense/deleteExpense',ExpenseControllers.deleteExpense)
 
 
 

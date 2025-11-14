@@ -3,7 +3,7 @@ const Expense = require('../../model/masterModels/ExpenseCategory')
 
 //Create Expense 
 
-exports.createExpense = async (req,res) =>{
+exports.createExpenseCategory = async (req,res) =>{
      
     try {
         const {
@@ -35,11 +35,11 @@ exports.createExpense = async (req,res) =>{
 
 //get all Expense 
 
-exports.getAllExpenses = async (req,res)=>{
+exports.getAllExpensesCategory = async (req,res)=>{
        try {
-           const Expenses = await Expense.find()
-           res.status(200).json(Expenses)
-           if(!Expenses){
+           const expensesType = await Expense.find()
+           res.status(200).json(expensesType)
+           if(!expensesType){
             return res.status(400).json({message:'Expenses is not find'})
            }
        } catch (error) {
@@ -49,7 +49,7 @@ exports.getAllExpenses = async (req,res)=>{
 
 
 
-// Get a single Machine  by Name
+// Get a single ExpenseCategory  by Name
 exports.getExpenseCategoryByName = async (req, res) => {
     try {
         
@@ -66,9 +66,9 @@ exports.getExpenseCategoryByName = async (req, res) => {
 };
 
 
-//update Expense
+//update ExpenseCategory
 
-exports.updateExpense= async (req,res) => {
+exports.updateExpenseCategory= async (req,res) => {
     try {
        
                const { _id,ExpenseCategoryName,ExpenseCategoryType,ExpenseCategoryCode,isActive } = req.body
@@ -93,8 +93,8 @@ exports.updateExpense= async (req,res) => {
 
 
 
-// Delete a Machine
-exports.deleteExpense= async (req, res) => {
+// Delete a Category
+exports.deleteExpenseCategory= async (req, res) => {
     try {
         const { _id } = req.body;
         
