@@ -15,7 +15,7 @@ exports.createExpense = async (req, res) => {
             ReferenceId,
             PatientId,
             referenceDes,
-            MachineCategoryid,
+            MachineiId,
             machineDes,
             otherDescription
         } = req.body;
@@ -32,7 +32,7 @@ exports.createExpense = async (req, res) => {
             ReferenceId,
             PatientId,
             referenceDes,
-            MachineCategoryid,
+            MachineiId,
             machineDes,
             otherDescription
         });
@@ -96,7 +96,7 @@ exports.updateExpense = async (req, res) => {
             ReferenceId,
             PatientId,
             referenceDes,
-            MachineCategoryid,
+            MachineiId,
             machineDes,
             otherDescription
         } = req.body;
@@ -115,7 +115,7 @@ exports.updateExpense = async (req, res) => {
                     ReferenceId,
                     PatientId,
                     referenceDes,
-                    MachineCategoryid,
+                    MachineiId,
                     machineDes,
                     otherDescription
                 }

@@ -42,9 +42,9 @@ const ExpenseSchema = new mongoose.Schema({
         type: String,
         trim: true
     },
-    MachineCategoryid: {   // after select Machine Maintances and this field Machine 
+    MachineiId: {   // after select Machine Maintances and this field Machine 
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'MachineCategory'
+        ref: 'Machine'
     },
     machineDes:{     // after select Machine Maintances and this field Machine Description 
            type: String,

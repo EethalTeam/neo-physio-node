@@ -102,9 +102,9 @@ exports.deleteExpenseCategory= async (req, res) => {
             return res.status(400).json({ message: 'Invalid ID' });
         }
         
-        const Expense = await Expense.findByIdAndDelete(_id);
+        const Expenses = await Expense.findByIdAndDelete(_id);
 
-        if (!Expense) {
+        if (!Expenses) {
             return res.status(400).json({ message: 'Expense not found' });
         }
 
