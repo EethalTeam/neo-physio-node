@@ -215,9 +215,9 @@ const patientSchema = new mongoose.Schema({
         type: Number,
         trim: true
     },
-    kmsFromPrevious:{
-        type:Number,
-        trim:true
+    kmsFromPrevious: {
+        type: Number,
+        trim: true
     },
     Feedback: {
         type: String,
@@ -228,37 +228,46 @@ const patientSchema = new mongoose.Schema({
         min: 0,
         max: 100
     },
-    historyOfFall:{
-        type:Boolean,
-        default:false
+    historyOfFall: {
+        type: Boolean,
+        default: false
     },
-    historyOfSurgery:{
-         type:Boolean,
-        default:false
+    historyOfSurgery: {
+        type: Boolean,
+        default: false
     },
-    historyOfSurgeryDetails:{
-        type:String,
-        trim:true
+    historyOfSurgeryDetails: {
+        type: String,
+        trim: true
 
     },
-    historyOfFallDetails:{
-        type:String,
-        trim:true
+    historyOfFallDetails: {
+        type: String,
+        trim: true
 
     },
-    reviewFrequency:{
+    reviewFrequency: {
+        type: Number,
+        trim: true
+
+    },
+    goalDescription: {
+        type: String,
+        trim: true
+    },
+    FeesTypeId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'FeesType'
+    },
+    feeAmount:{
         type:Number,
         trim:true
-
     },
-    goalDescription:{
-        type:String,
-        trim:true
+    ReferenceId:{
+         type: mongoose.Schema.Types.ObjectId,
+        ref: 'Reference'
     }
 
-    
-
-
-},{timestamps:true})
+}, { timestamps: true })
 const PatientModel = mongoose.model('Patient', patientSchema)
 module.exports = PatientModel

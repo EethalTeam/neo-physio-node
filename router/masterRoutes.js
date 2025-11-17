@@ -15,6 +15,7 @@ const LeadSourceControllers = require('../controllers/mastercontrollers/LeadSour
 const GenderControllers = require('../controllers/mastercontrollers/GenderControllers')
 const RiskFactorControllers = require('../controllers/mastercontrollers/RiskFactorControllers')
 const ExpenseTypeController = require('../controllers/mastercontrollers/ExpenseTypeControllers')
+const FeesTypeControllers = require('../controllers/mastercontrollers/FeesTypeControllers')
 
 
 
@@ -125,6 +126,13 @@ router.post("/RiskFactor/getAllRiskFactor",RiskFactorControllers.getAllRiskFacto
 router.post("/RiskFactor/getSingleRiskFactor",RiskFactorControllers.getByRiskFactorName)
 router.post("/RiskFactor/updateRiskFactor",RiskFactorControllers.updateRiskFactor)
 router.post("/RiskFactor/deleteRiskFactor",RiskFactorControllers.deleteRiskFactor)
+
+//FeesTypeControllers
+router.post('/FeesType/createFeesType',FeesTypeControllers.createFeesType)
+router.post('/FeesType/getAllFeesType',FeesTypeControllers.getAllFeesType)
+router.post('/FeesType/getSingleFeesType',FeesTypeControllers.getFeesTypeByName)
+router.post('/FeesType/updateFeesType',FeesTypeControllers.updateFeesType)
+router.post('/FeesType/deleteFeesType',FeesTypeControllers.deleteFeesType)
 
 
 

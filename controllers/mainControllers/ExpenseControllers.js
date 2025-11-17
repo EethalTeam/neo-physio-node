@@ -52,7 +52,7 @@ exports.createExpense = async (req, res) => {
 // Get all Expense
 exports.getAllExpense = async (req, res) => {
     try {
-        const expenses = await Expense.find().populate("patientGenderId", "genderName").populate("MedicalHistoryAndRiskFactor.RiskFactorID", "RiskFactorName").populate("physioId", "physioName")
+        const expenses = await Expense.find().populate("ExpenseTypeID", "ExpenseTypeName").populate("ExpenseCategoryId", "ExpenseCategoryName").populate("physioId", "physioName").populate("ReferenceId",'sourceName').populate("PatientId","patientName").populate("MachineiId","machineName")
         if (!expenses) {
             res.status(400).json({ message: "Expense is not found" })
         }

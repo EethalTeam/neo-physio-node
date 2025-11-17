@@ -7,9 +7,10 @@ exports.createPatients = async (req, res) => {
         const { patientName, patientCode, isActive, consultationDate, historyOfFall, historyOfSurgery, historyOfSurgeryDetails, historyOfFallDetails,
             patientAge, patientGenderId, byStandar, Relation, patientNumber, patientAltNum, patientAddress, patientPinCode, patientCondition, physioId,
             reviewDate, MedicalHistoryAndRiskFactor, otherMedCon, currMed, typesOfLifeStyle, smokingOrAlcohol, dietaryHabits, Contraindications
-            , painLevel, rangeOfMotion, muscleStrength, postureOrGaitAnalysis, functionalLimitations, ADLAbility, shortTermGoals,goalDescription,
+            , painLevel, rangeOfMotion, muscleStrength, postureOrGaitAnalysis, functionalLimitations, ADLAbility, shortTermGoals, goalDescription,
             longTermGoals, RecomTherapy, Frequency, Duration, noOfDays, Modalities, targetedArea, hodNotes, Physiotherapist, sessionStartDate, sessionTime,
-            totalSessionDays, InitialShorttermGoal, goalDuration, visitOrder, KmsfromHub, KmsfLPatienttoHub, Feedback, Satisfaction, kmsFromPrevious, reviewFrequency
+            totalSessionDays, InitialShorttermGoal, goalDuration, visitOrder, KmsfromHub, KmsfLPatienttoHub, Feedback, Satisfaction, kmsFromPrevious, reviewFrequency,
+            FeesTypeId,feeAmount,ReferenceId
         } = req.body;
         // Check for duplicates (if needed)
         const existingPatient = await Patient.findOne({ patientCode: patientCode });
@@ -21,9 +22,10 @@ exports.createPatients = async (req, res) => {
             patientName, patientCode, isActive, consultationDate, historyOfFall, historyOfSurgery, historyOfSurgeryDetails, historyOfFallDetails,
             patientAge, patientGenderId, byStandar, Relation, patientNumber, patientAltNum, patientAddress, patientPinCode, patientCondition, physioId,
             reviewDate, MedicalHistoryAndRiskFactor, otherMedCon, currMed, typesOfLifeStyle, smokingOrAlcohol, dietaryHabits, Contraindications
-            , painLevel, rangeOfMotion, muscleStrength, postureOrGaitAnalysis, functionalLimitations, ADLAbility, shortTermGoals,goalDescription,
+            , painLevel, rangeOfMotion, muscleStrength, postureOrGaitAnalysis, functionalLimitations, ADLAbility, shortTermGoals, goalDescription,
             longTermGoals, RecomTherapy, Frequency, Duration, noOfDays, Modalities, targetedArea, hodNotes, Physiotherapist, sessionStartDate, sessionTime,
-            totalSessionDays, InitialShorttermGoal, goalDuration, visitOrder, KmsfromHub, KmsfLPatienttoHub, Feedback, Satisfaction, kmsFromPrevious, reviewFrequency
+            totalSessionDays, InitialShorttermGoal, goalDuration, visitOrder, KmsfromHub, KmsfLPatienttoHub, Feedback, Satisfaction, kmsFromPrevious, reviewFrequency,
+            FeesTypeId, feeAmount,ReferenceId
         });
         await patients.save();
 
@@ -77,9 +79,10 @@ exports.updatePatients = async (req, res) => {
         const { _id, patientName, patientCode, isActive, consultationDate, historyOfFall, historyOfSurgery, historyOfSurgeryDetails, historyOfFallDetails,
             patientAge, patientGenderId, byStandar, Relation, patientNumber, patientAltNum, patientAddress, patientPinCode, patientCondition, physioId,
             reviewDate, MedicalHistoryAndRiskFactor, otherMedCon, currMed, typesOfLifeStyle, smokingOrAlcohol, dietaryHabits, Contraindications
-            , painLevel, rangeOfMotion, muscleStrength, postureOrGaitAnalysis, functionalLimitations, ADLAbility, shortTermGoals,goalDescription,
+            , painLevel, rangeOfMotion, muscleStrength, postureOrGaitAnalysis, functionalLimitations, ADLAbility, shortTermGoals, goalDescription,
             longTermGoals, RecomTherapy, Frequency, Duration, noOfDays, Modalities, targetedArea, hodNotes, Physiotherapist, sessionStartDate, sessionTime,
-            totalSessionDays, InitialShorttermGoal, goalDuration, visitOrder, KmsfromHub, KmsfLPatienttoHub, Feedback, Satisfaction, kmsFromPrevious, reviewFrequency
+            totalSessionDays, InitialShorttermGoal, goalDuration, visitOrder, KmsfromHub, KmsfLPatienttoHub, Feedback, Satisfaction, kmsFromPrevious, reviewFrequency,
+            FeesTypeId,feeAmount,ReferenceId
         } = req.body;
 
         const Patients = await Patient.findByIdAndUpdate(
@@ -89,9 +92,10 @@ exports.updatePatients = async (req, res) => {
                     patientName, patientCode, isActive, consultationDate, historyOfFall, historyOfSurgery, historyOfSurgeryDetails, historyOfFallDetails,
                     patientAge, patientGenderId, byStandar, Relation, patientNumber, patientAltNum, patientAddress, patientPinCode, patientCondition, physioId,
                     reviewDate, MedicalHistoryAndRiskFactor, otherMedCon, currMed, typesOfLifeStyle, smokingOrAlcohol, dietaryHabits, Contraindications
-                    , painLevel, rangeOfMotion, muscleStrength, postureOrGaitAnalysis, functionalLimitations, ADLAbility, shortTermGoals,goalDescription,
+                    , painLevel, rangeOfMotion, muscleStrength, postureOrGaitAnalysis, functionalLimitations, ADLAbility, shortTermGoals, goalDescription,
                     longTermGoals, RecomTherapy, Frequency, Duration, noOfDays, Modalities, targetedArea, hodNotes, Physiotherapist, sessionStartDate, sessionTime,
-                    totalSessionDays, InitialShorttermGoal, goalDuration, visitOrder, KmsfromHub, KmsfLPatienttoHub, Feedback, Satisfaction, kmsFromPrevious, reviewFrequency
+                    totalSessionDays, InitialShorttermGoal, goalDuration, visitOrder, KmsfromHub, KmsfLPatienttoHub, Feedback, Satisfaction, kmsFromPrevious, reviewFrequency,
+                    FeesTypeId,  feeAmount,ReferenceId
                 }
             },
             { new: true, runValidators: true }
@@ -136,9 +140,9 @@ exports.deletePatients = async (req, res) => {
 
 exports.AssignPhysio = async (req, res) => {
     try {
-        const { 
+        const {
             _id,
-             
+
             sessionStartDate,
             sessionTime,
             physioId,
@@ -153,12 +157,12 @@ exports.AssignPhysio = async (req, res) => {
             kmsFromPrevious
         } = req.body;
 
-        const AssignPhysio =await Patient.findByIdAndUpdate(
+        const AssignPhysio = await Patient.findByIdAndUpdate(
             _id,
             {
                 $set: {
-                    
-                     sessionStartDate,
+
+                    sessionStartDate,
                     sessionTime,
                     totalSessionDays,
                     InitialShorttermGoal,
@@ -169,7 +173,8 @@ exports.AssignPhysio = async (req, res) => {
                     visitOrder,
                     KmsfromHub,
                     KmsfLPatienttoHub,
-                    kmsFromPrevious}
+                    kmsFromPrevious
+                }
             },
             { new: true, runValidators: true }
         );

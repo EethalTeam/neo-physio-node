@@ -46,6 +46,10 @@ const leadSchema = new Schema({
         type: Boolean,
         default: false
     },
+     ReferenceId:{
+         type: mongoose.Schema.Types.ObjectId,
+        ref: 'Reference'
+    },
     leadDocuments: [
         {
             fileName: { 

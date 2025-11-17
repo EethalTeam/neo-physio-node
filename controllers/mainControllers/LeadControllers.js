@@ -14,7 +14,8 @@ exports.createLead = async (req, res) => {
             leadSourceId,
             leadMedicalHistory,
             leadAddress,
-            isQualified
+            isQualified,
+            ReferenceId
         } = req.body;
 
         let leadDocuments = [];
@@ -50,7 +51,8 @@ exports.createLead = async (req, res) => {
             leadMedicalHistory,
             leadAddress,
             isQualified: isQualified || false,
-            leadDocuments
+            leadDocuments,
+            ReferenceId
         });
 
         const savedLead = await newLead.save();
@@ -118,7 +120,10 @@ exports.updateLead = async (req, res) => {
                     leadMedicalHistory,
                     leadAddress,
                     isQualified,
-                    leadDocuments } = req.body;
+                    leadDocuments,
+                    ReferenceId
+                 } = req.body;
+
 
         const lead = await Lead.findByIdAndUpdate(
             leadId,
@@ -135,7 +140,8 @@ exports.updateLead = async (req, res) => {
                     leadMedicalHistory,
                     leadAddress,
                     isQualified: isQualified || false,
-                    leadDocuments
+                    leadDocuments,
+                    ReferenceId
                 }
 
             },
