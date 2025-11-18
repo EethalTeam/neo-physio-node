@@ -47,8 +47,9 @@ const leadSchema = new Schema({
         default: false
     },
      ReferenceId:{
-         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Reference'
+         type: Schema.Types.ObjectId,
+        ref: 'Reference',
+        default:null
     },
     leadDocuments: [
         {

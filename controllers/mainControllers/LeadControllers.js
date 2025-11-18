@@ -15,7 +15,9 @@ exports.createLead = async (req, res) => {
             leadMedicalHistory,
             leadAddress,
             isQualified,
-            ReferenceId
+            ReferenceId,
+            leadSourceName,
+            sourceName
         } = req.body;
 
         let leadDocuments = [];
@@ -29,18 +31,17 @@ exports.createLead = async (req, res) => {
                 };
             });
         }
-  
-    const lastLead = await Lead.findOne({}, {}, { sort: { 'createdAt': -1 } });
-    let nextLeadNumber = 1;
-    
-    if (lastLead && lastLead.leadCode) {
-      const lastNumber = parseInt(lastLead.leadCode.replace('LEAD', ''));
-      nextLeadNumber = isNaN(lastNumber) ? 1 : lastNumber + 1;
-    }
-    
-    const leadCode = `LEAD${String(nextLeadNumber).padStart(3, '0')}`;
-    
-        const newLead = new Lead({
+
+        const lastLead = await Lead.findOne({}, {}, { sort: { 'createdAt': -1 } });
+        let nextLeadNumber = 1;
+
+        if (lastLead && lastLead.leadCode) {
+            const lastNumber = parseInt(lastLead.leadCode.replace('LEAD', ''));
+            nextLeadNumber = isNaN(lastNumber) ? 1 : lastNumber + 1;
+        }
+
+        const leadCode = `LEAD${String(nextLeadNumber).padStart(3, '0')}`;
+let LeadData={
             leadName,
             leadCode,
             leadAge,
@@ -52,8 +53,13 @@ exports.createLead = async (req, res) => {
             leadAddress,
             isQualified: isQualified || false,
             leadDocuments,
-            ReferenceId
-        });
+            leadSourceName,
+            sourceName
+        }
+        if(ReferenceId){
+            LeadData.ReferenceId = ReferenceId
+        }
+        const newLead = new Lead(LeadData);
 
         const savedLead = await newLead.save();
         res.status(201).json(savedLead);
@@ -73,7 +79,7 @@ exports.getAllLeads = async (req, res) => {
         const skip = (page - 1) * limit;
 
         const leads = await Lead.find()
-            .populate('leadGenderId leadSourceId physioCategoryId')
+            .populate('leadGenderId leadSourceId physioCategoryId ReferenceId')
             .skip(skip)
             .limit(limit)
             .sort({ createdAt: -1 });
@@ -95,7 +101,7 @@ exports.getAllLeads = async (req, res) => {
 exports.getLeadById = async (req, res) => {
     try {
         const lead = await Lead.findById(req.params.id)
-            .populate('leadGenderId leadSourceId physioCategoryId');
+            .populate('leadGenderId leadSourceId physioCategoryId ReferenceId');
 
         if (!lead) {
             return res.status(404).json({ message: 'Lead not found' });
@@ -111,44 +117,52 @@ exports.getLeadById = async (req, res) => {
 exports.updateLead = async (req, res) => {
     try {
         const { leadId, leadName,
-                    leadCode,
-                    leadAge,
-                    leadGenderId,
-                    physioCategoryId,
-                    leadContactNo,
-                    leadSourceId,
-                    leadMedicalHistory,
-                    leadAddress,
-                    isQualified,
-                    leadDocuments,
-                    ReferenceId
-                 } = req.body;
+            leadCode,
+            leadAge,
+            leadGenderId,
+            physioCategoryId,
+            leadContactNo,
+            leadSourceId,
+            leadMedicalHistory,
+            leadAddress,
+            isQualified,
+            leadDocuments,
+            ReferenceId,
+            sourceName,
+            leadSourceName
 
 
+        } = req.body;
+
+let LeadData={
+            leadName,
+            leadCode,
+            leadAge,
+            leadGenderId,
+            physioCategoryId,
+            leadContactNo,
+            leadSourceId,
+            leadMedicalHistory,
+            leadAddress,
+            isQualified: isQualified || false,
+            leadDocuments,
+            leadSourceName,
+            sourceName
+        }
+        if(ReferenceId){
+            LeadData.ReferenceId = ReferenceId
+        }
         const lead = await Lead.findByIdAndUpdate(
             leadId,
             {
                 $set:
-                {
-                    leadName,
-                    leadCode,
-                    leadAge,
-                    leadGenderId,
-                    physioCategoryId,
-                    leadContactNo,
-                    leadSourceId,
-                    leadMedicalHistory,
-                    leadAddress,
-                    isQualified: isQualified || false,
-                    leadDocuments,
-                    ReferenceId
-                }
+                LeadData
 
             },
             { new: true, runValidators: true });
 
         if (!lead) {
-            return res.status(404).json({ message: 'Lead not found' });
+            return res.status(404).json({ message: 'Lead not able to update' });
         }
 
         if (req.files && req.files.length > 0) {
@@ -160,7 +174,7 @@ exports.updateLead = async (req, res) => {
 
             lead.leadDocuments.push(...newDocuments);
         }
-         await lead.save();
+        await lead.save();
         res.status(200).json(lead);
 
     } catch (error) {

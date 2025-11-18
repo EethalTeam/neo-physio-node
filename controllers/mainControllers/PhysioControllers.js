@@ -100,12 +100,12 @@ exports.getAllPhysios = async (req, res) => {
 exports.getPhysioById = async (req, res) => {
     try {
         
-        const { id } = req.body; 
-        if (!id) {
+        const { _id } = req.body; 
+        if (!_id) {
             return res.status(400).json({ message: 'Physio ID is required in the body.' });
         }
 
-        const physio = await Physio.findById(id)
+        const physio = await Physio.findById(_id)
             .populate('physioGenderId');
 
         if (!physio) {

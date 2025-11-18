@@ -16,6 +16,7 @@ const GenderControllers = require('../controllers/mastercontrollers/GenderContro
 const RiskFactorControllers = require('../controllers/mastercontrollers/RiskFactorControllers')
 const ExpenseTypeController = require('../controllers/mastercontrollers/ExpenseTypeControllers')
 const FeesTypeControllers = require('../controllers/mastercontrollers/FeesTypeControllers')
+const LeadStatusController = require('../controllers/mastercontrollers/LeadStatusControllers')
 
 
 
@@ -133,6 +134,14 @@ router.post('/FeesType/getAllFeesType',FeesTypeControllers.getAllFeesType)
 router.post('/FeesType/getSingleFeesType',FeesTypeControllers.getFeesTypeByName)
 router.post('/FeesType/updateFeesType',FeesTypeControllers.updateFeesType)
 router.post('/FeesType/deleteFeesType',FeesTypeControllers.deleteFeesType)
+
+
+//LeadStatusController 
+router.post("/LeadStatus/createLeadStatus",LeadStatusController.createLeadStatus)
+router.post("/LeadStatus/getAllLeadStatus",LeadStatusController.getAllLeadStatus)
+router.post("/LeadStatus/getSingleLeadStatus",LeadStatusController.getLeadStatusByName)
+router.post("/LeadStatus/updateLeadStatus",LeadStatusController.updateLeadStatus)
+router.post("/LeadStatus/deleteLeadStatus",LeadStatusController.deleteLeadStatus)
 
 
 

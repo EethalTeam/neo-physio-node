@@ -2,7 +2,7 @@ const mongoose = require('mongoose')
 
 
 
-// define Gender Schema
+// define LeadSource Schema
 const leadSchema = new mongoose.Schema({
     
     leadSourceCode:{
