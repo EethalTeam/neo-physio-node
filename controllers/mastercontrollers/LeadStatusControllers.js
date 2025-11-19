@@ -4,7 +4,7 @@ const LeadStatus = require('../../model/masterModels/Leadstatus')
 // Create a new  LeadStatus
 exports.createLeadStatus = async (req, res) => {
     try {
-        const { leadStatusName, leadStatusCode, isActive } = req.body;
+        const { leadStatusName, leadStatusCode, isActive ,leadStatusColor,leadStatusTextColor} = req.body;
 
         // Check for duplicates (if needed)
         const existingLeadStatus = await  LeadStatus.findOne({
@@ -17,7 +17,7 @@ exports.createLeadStatus = async (req, res) => {
             return res.status(400).json({ message: 'LeadStatus with this code or name already exists' });
         }
         // Create and save the new LeadSource
-        const leadStatus = new LeadStatus({ leadStatusName, leadStatusCode, isActive  });
+        const leadStatus = new LeadStatus({ leadStatusName, leadStatusCode, isActive ,leadStatusColor,leadStatusTextColor });
         await leadStatus.save();
 
         res.status(200).json({
@@ -67,11 +67,11 @@ exports.getLeadStatusByName = async (req, res) => {
 // Update a LeadStatus
 exports.updateLeadStatus = async (req, res) => {
     try {
-        const { _id, leadStatusName, leadStatusCode, isActive  } = req.body
+        const { _id, leadStatusName, leadStatusCode, isActive ,leadStatusColor,leadStatusTextColor  } = req.body
 
         const leadStatus = await LeadStatus.findByIdAndUpdate(
             _id,
-            { $set: { leadStatusName, leadStatusCode, isActive } },
+            { $set: { leadStatusName, leadStatusCode, isActive ,leadStatusColor,leadStatusTextColor } },
             { new: true, runValidators: true }
         );
 

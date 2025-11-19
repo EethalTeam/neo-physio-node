@@ -15,6 +15,12 @@ const LeadStatusSchema = new mongoose.Schema({
         trim:true,
       
     },
+    leadStatusColor:{
+        type:String,
+    },
+    leadStatusTextColor:{
+              type:String,
+    },
     isActive:{
         type:Boolean,
         default:true

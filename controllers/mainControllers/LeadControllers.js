@@ -17,7 +17,9 @@ exports.createLead = async (req, res) => {
             isQualified,
             ReferenceId,
             leadSourceName,
-            sourceName
+            sourceName,
+            LeadStatusId,
+            leadStatusName
         } = req.body;
 
         let leadDocuments = [];
@@ -54,7 +56,9 @@ let LeadData={
             isQualified: isQualified || false,
             leadDocuments,
             leadSourceName,
-            sourceName
+            sourceName,
+             LeadStatusId,
+            leadStatusName
         }
         if(ReferenceId){
             LeadData.ReferenceId = ReferenceId
@@ -79,7 +83,7 @@ exports.getAllLeads = async (req, res) => {
         const skip = (page - 1) * limit;
 
         const leads = await Lead.find()
-            .populate('leadGenderId leadSourceId physioCategoryId ReferenceId')
+            .populate('leadGenderId leadSourceId physioCategoryId ReferenceId LeadStatusId')
             .skip(skip)
             .limit(limit)
             .sort({ createdAt: -1 });
@@ -101,7 +105,7 @@ exports.getAllLeads = async (req, res) => {
 exports.getLeadById = async (req, res) => {
     try {
         const lead = await Lead.findById(req.params.id)
-            .populate('leadGenderId leadSourceId physioCategoryId ReferenceId');
+            .populate('leadGenderId leadSourceId physioCategoryId ReferenceId LeadStatusId');
 
         if (!lead) {
             return res.status(404).json({ message: 'Lead not found' });
@@ -129,7 +133,9 @@ exports.updateLead = async (req, res) => {
             leadDocuments,
             ReferenceId,
             sourceName,
-            leadSourceName
+            leadSourceName,
+             LeadStatusId,
+            leadStatusName
 
 
         } = req.body;
@@ -147,7 +153,9 @@ let LeadData={
             isQualified: isQualified || false,
             leadDocuments,
             leadSourceName,
-            sourceName
+            sourceName,
+             LeadStatusId,
+            leadStatusName
         }
         if(ReferenceId){
             LeadData.ReferenceId = ReferenceId

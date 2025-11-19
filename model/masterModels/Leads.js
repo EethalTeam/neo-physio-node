@@ -28,17 +28,17 @@ const leadSchema = new Schema({
     },
     leadGenderId: {
         type: Schema.Types.ObjectId,
-        ref: 'Gender' 
+        ref: 'Gender'
     },
     physioCategoryId: {
         type: Schema.Types.ObjectId,
-        ref: 'PhysioCategory' 
+        ref: 'PhysioCategory'
     },
     leadSourceId: {
         type: Schema.Types.ObjectId,
-        ref: 'LeadSource' 
+        ref: 'LeadSource'
     },
-    leadMedicalHistory: { 
+    leadMedicalHistory: {
         type: String,
         trim: true
     },
@@ -46,27 +46,32 @@ const leadSchema = new Schema({
         type: Boolean,
         default: false
     },
-     ReferenceId:{
-         type: Schema.Types.ObjectId,
+    ReferenceId: {
+        type: Schema.Types.ObjectId,
         ref: 'Reference',
-        default:null
+        default: null
+    },
+    LeadStatusId: {
+        type: Schema.Types.ObjectId,
+        ref: 'LeadStatus',
+        default: null
     },
     leadDocuments: [
         {
-            fileName: { 
-                type: String, 
-                required: true 
+            fileName: {
+                type: String,
+                required: true
             },
-            fileUrl: { 
-                type: String, 
-                required: true 
+            fileUrl: {
+                type: String,
+                required: true
             },
-            fileType: { 
-                type: String 
+            fileType: {
+                type: String
             },
-            uploadedAt: { 
-                type: Date, 
-                default: Date.now 
+            uploadedAt: {
+                type: Date,
+                default: Date.now
             }
         }
     ]
