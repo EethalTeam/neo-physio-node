@@ -23,5 +23,5 @@ const ModalitiesSchema = new mongoose.Schema({
 
 
 },{timestamps:true})
-const ModalitiesModel = mongoose.model('Modalities',ModalitiesSchema)
+const ModalitiesModel = mongoose.model('Modalitie',ModalitiesSchema)
 module.exports=ModalitiesModel;
