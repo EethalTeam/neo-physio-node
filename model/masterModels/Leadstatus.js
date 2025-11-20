@@ -7,25 +7,22 @@ const LeadStatusSchema = new mongoose.Schema({
     
     leadStatusCode:{
         type:String,
-        trim:true,
-     
+        trim:true
     },
     leadStatusName:{
         type:String,
-        trim:true,
-      
+        trim:true
     },
     leadStatusColor:{
-        type:String,
+        type:String
     },
     leadStatusTextColor:{
-              type:String,
+              type:String
     },
     isActive:{
         type:Boolean,
         default:true
     }
-
 
 },{timestamps:true})
 const LeadStatusModel = mongoose.model('LeadStatus',LeadStatusSchema)

@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const Patient = require('../../model/masterModels/Patient')
+const Session = require('../../model/masterModels/Session');
+const Counter = require('../../model/masterModels/Counter')
 
 // Create a new Patient
 exports.createPatients = async (req, res) => {
@@ -37,9 +39,6 @@ exports.createPatients = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
-
-
-
 // Get all Patient
 exports.getAllPatients = async (req, res) => {
     try {
@@ -53,10 +52,6 @@ exports.getAllPatients = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
-
-
-
-
 // Get a single Patient by name
 exports.getByPatientsName = async (req, res) => {
     try {
@@ -71,8 +66,6 @@ exports.getByPatientsName = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
-
-
 // Update a Patients
 exports.updatePatients = async (req, res) => {
     try {
@@ -110,8 +103,6 @@ exports.updatePatients = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
-
-
 // Delete a Patient
 exports.deletePatients = async (req, res) => {
     try {
@@ -134,15 +125,10 @@ exports.deletePatients = async (req, res) => {
     }
 };
 
-
-//get all Assignn physio
-
-
 exports.AssignPhysio = async (req, res) => {
     try {
         const {
             _id,
-
             sessionStartDate,
             sessionTime,
             physioId,
@@ -161,7 +147,6 @@ exports.AssignPhysio = async (req, res) => {
             _id,
             {
                 $set: {
-
                     sessionStartDate,
                     sessionTime,
                     totalSessionDays,
@@ -183,12 +168,57 @@ exports.AssignPhysio = async (req, res) => {
             return res.status(400).json({ message: 'AssignPhysio Cant able to update' });
         }
 
-        res.status(200).json({ message: 'AssignPhysio updated successfully', AssignPhysio });
+        const counter = await Counter.findByIdAndUpdate(
+            { _id: 'sessionCode' },
+            { $inc: { seq: totalSessionDays } }, 
+            { new: true, upsert: true }
+        );
+
+        let nextSequenceNumber = counter.seq - totalSessionDays + 1;
+
+        const sessionsToCreate = [];
+        let sessionsGenerated = 0;
+        let currentDate = new Date(sessionStartDate);
+        const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+        while (sessionsGenerated < totalSessionDays) {
+            const currentDayIndex = currentDate.getDay(); 
+
+            // Skip Sunday
+            if (currentDayIndex === 0) {
+                currentDate.setDate(currentDate.getDate() + 1);
+                continue;
+            }
+            const formattedCode = `SESS-${String(nextSequenceNumber).padStart(6, '0')}`;
+
+            sessionsToCreate.push({
+                patientId: _id,
+                physioId: physioId,
+                sessionDate: new Date(currentDate), 
+                sessionTime: sessionTime, 
+                sessionDay: daysOfWeek[currentDayIndex], 
+                sessionCode: formattedCode, 
+                sessionStatusId: null, 
+            });
+
+            // Increment our local counters
+            sessionsGenerated++;
+            nextSequenceNumber++; // Move to the next number for the loop
+            
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+
+        if (sessionsToCreate.length > 0) {
+            await Session.insertMany(sessionsToCreate);
+        }
+
+        res.status(200).json({ 
+            message: `Assigned and generated ${sessionsToCreate.length} sessions (Range: ${sessionsToCreate[0].sessionCode} to ${sessionsToCreate[sessionsToCreate.length-1].sessionCode})`, 
+            AssignPhysio: updatedPatient 
+        });
+
     } catch (error) {
+        console.error("Error assigning physio:", error);
         res.status(500).json({ message: error.message });
     }
 };
-
-
-
-

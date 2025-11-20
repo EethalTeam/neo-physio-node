@@ -1,4 +1,6 @@
 const Lead = require('../../model/masterModels/Leads');
+const Patient = require('../../model/masterModels/Patient')
+const LeadStatus = require('../../model/masterModels/Leadstatus')
 const fs = require('fs');
 const path = require('path');
 const mongoose = require('mongoose')
@@ -43,7 +45,7 @@ exports.createLead = async (req, res) => {
         }
 
         const leadCode = `LEAD${String(nextLeadNumber).padStart(3, '0')}`;
-let LeadData={
+        let LeadData = {
             leadName,
             leadCode,
             leadAge,
@@ -57,10 +59,10 @@ let LeadData={
             leadDocuments,
             leadSourceName,
             sourceName,
-             LeadStatusId,
+            LeadStatusId,
             leadStatusName
         }
-        if(ReferenceId){
+        if (ReferenceId) {
             LeadData.ReferenceId = ReferenceId
         }
         const newLead = new Lead(LeadData);
@@ -120,7 +122,8 @@ exports.getLeadById = async (req, res) => {
 
 exports.updateLead = async (req, res) => {
     try {
-        const { leadId, leadName,
+        const { leadId,
+            leadName,
             leadCode,
             leadAge,
             leadGenderId,
@@ -134,13 +137,13 @@ exports.updateLead = async (req, res) => {
             ReferenceId,
             sourceName,
             leadSourceName,
-             LeadStatusId,
+            LeadStatusId,
             leadStatusName
 
 
         } = req.body;
 
-let LeadData={
+        let LeadData = {
             leadName,
             leadCode,
             leadAge,
@@ -154,17 +157,17 @@ let LeadData={
             leadDocuments,
             leadSourceName,
             sourceName,
-             LeadStatusId,
+            LeadStatusId,
             leadStatusName
         }
-        if(ReferenceId){
+        if (ReferenceId) {
             LeadData.ReferenceId = ReferenceId
         }
         const lead = await Lead.findByIdAndUpdate(
             leadId,
             {
                 $set:
-                LeadData
+                    LeadData
 
             },
             { new: true, runValidators: true });
@@ -189,6 +192,80 @@ let LeadData={
         res.status(500).json({ message: error.message });
     }
 };
+
+exports.QualifyLead = async (req, res) => {
+    try {
+        const {
+            _id,
+            leadName,
+            leadAge,
+            leadGenderId,
+            leadContactNo,
+            leadSourceId,
+            leadMedicalHistory,
+            leadAddress,
+            ReferenceId,
+            ConsultationDate
+        } = req.body
+
+        const lastPatient = await Patient.findOne({}, {}, { sort: { 'createdAt': -1 } });
+        let nextPatientNumber = 1;
+
+        if (lastPatient && lastPatient.patientCode) {
+            const lastNumber = parseInt(lastPatient.patientCode.replace('Patient', ''));
+            nextPatientNumber = isNaN(lastNumber) ? 1 : lastNumber + 1;
+        }
+
+        const patientCode = `Patient${String(nextPatientNumber).padStart(5, '0')}`;
+
+        const patients = new Patient({
+            patientName: leadName,
+            patientCode: patientCode,
+            isActive: true,
+            consultationDate: ConsultationDate,
+            patientAge: leadAge,
+            otherMedCon: leadMedicalHistory,
+            patientGenderId: leadGenderId._id,
+            patientNumber: leadContactNo,
+            patientAddress: leadAddress
+        });
+        if (ReferenceId) {
+            patients.ReferenceId = new mongoose.Types.ObjectId(ReferenceId._id)
+        }
+        await patients.save();
+        if (patients) {
+            const Leadstatus = await LeadStatus.findOne({ leadStatusName: 'Qualified' })
+            if (Leadstatus) {
+                const lead = await Lead.findByIdAndUpdate(
+                    _id,
+                    {
+                        $set:
+                            { LeadStatusId: new mongoose.Types.ObjectId(Leadstatus._id) }
+
+                    },
+                    { new: true, runValidators: true });
+                if (!lead) {
+                    return res.status(404).json({ message: 'Lead not able to update' });
+                }
+            }else{
+                res.status(500).json({
+                message: 'Lead status not found'
+            });
+            }
+
+            res.status(200).json({
+                message: 'Lead qualified and Patient created successfully',
+                data: patients._id
+            });
+        } else {
+            res.status(500).json({
+                message: 'Lead qualify failed'
+            });
+        }
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+}
 
 exports.deleteLead = async (req, res) => {
     try {

@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 
-const LeadControllers = require("../controllers/maincontrollers/LeadControllers")
+const LeadControllers = require("../controllers/mainControllers/LeadControllers")
 const physioControllers = require("../controllers/maincontrollers/PhysioControllers")
 const PatientControllers = require('../controllers/maincontrollers/PatientControllers')
 const ExpenseControllers = require('../controllers/maincontrollers/ExpenseControllers')
@@ -12,7 +12,8 @@ router.post("/Lead/createLead",LeadControllers.createLead)
 router.post("/Lead/getAllLead",LeadControllers.getAllLeads)
 router.post("/Lead/getSingleLead",LeadControllers.getLeadById)
 router.post("/Lead/updateLead",LeadControllers.updateLead)
-router.post("/Lead/deleteLead",LeadControllers.deleteLead)  
+router.post("/Lead/deleteLead",LeadControllers.deleteLead)
+router.post("/Lead/QualifyLead",LeadControllers.QualifyLead)
 
 //Physio 
 router.post("/Physio/createPhysio",physioControllers.createPhysio)
