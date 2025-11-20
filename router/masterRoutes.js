@@ -17,6 +17,8 @@ const RiskFactorControllers = require('../controllers/mastercontrollers/RiskFact
 const ExpenseTypeController = require('../controllers/mastercontrollers/ExpenseTypeControllers')
 const FeesTypeControllers = require('../controllers/mastercontrollers/FeesTypeControllers')
 const LeadStatusController = require('../controllers/mastercontrollers/LeadStatusControllers')
+const SessionStatusControllers = require('../controllers/mastercontrollers/SessionStatusControllers')
+const ModalitiesControllers = require('../controllers/mastercontrollers/ModalitiesControllers')
 
 
 
@@ -142,6 +144,22 @@ router.post("/LeadStatus/getAllLeadStatus",LeadStatusController.getAllLeadStatus
 router.post("/LeadStatus/getSingleLeadStatus",LeadStatusController.getLeadStatusByName)
 router.post("/LeadStatus/updateLeadStatus",LeadStatusController.updateLeadStatus)
 router.post("/LeadStatus/deleteLeadStatus",LeadStatusController.deleteLeadStatus)
+
+
+//SessionStatusControllers
+router.post('/SessionStatus/createSessionStatus',SessionStatusControllers.createSessionStatus)
+router.post('/SessionStatus/getAllSessionStatus',SessionStatusControllers.getAllSessionStatus)
+router.post('/SessionStatus/getSingleSessionStatus',SessionStatusControllers.getLeadStatusByName)
+router.post('/SessionStatus/updateSessionStatus',SessionStatusControllers.updateSessionStatus)
+router.post('/SessionStatus/deleteSessionStatus',SessionStatusControllers.deleteSessionStatus)
+
+
+//ModalitiesControllers
+router.post('/Modalities/createModalities',ModalitiesControllers.createModalities)
+router.post('/Modalities/getAllModalities',ModalitiesControllers.getAllModalities)
+router.post('/Modalities/getSingleModalities',ModalitiesControllers.getModalitiesByName)
+router.post('/Modalities/updateModalities',ModalitiesControllers.updateModalities)
+router.post('/Modalities/deleteModalities',ModalitiesControllers.deleteModalities)
 
 
 
