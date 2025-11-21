@@ -175,10 +175,13 @@ exports.AssignPhysio = async (req, res) => {
         );
 
         let nextSequenceNumber = counter.seq - totalSessionDays + 1;
+       
+        let currentDate = new Date(sessionStartDate);
+        currentDate.setHours(12, 0, 0, 0);
 
         const sessionsToCreate = [];
         let sessionsGenerated = 0;
-        let currentDate = new Date(sessionStartDate);
+        
         const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
         while (sessionsGenerated < totalSessionDays) {
@@ -196,9 +199,9 @@ exports.AssignPhysio = async (req, res) => {
                 physioId: physioId,
                 sessionDate: new Date(currentDate), 
                 sessionTime: sessionTime, 
+                sessionStatusId: new mongoose.Types.ObjectId('691ecb36b87c5c57dead47a7'),
                 sessionDay: daysOfWeek[currentDayIndex], 
-                sessionCode: formattedCode, 
-                sessionStatusId: null, 
+                sessionCode: formattedCode
             });
 
             // Increment our local counters
@@ -214,7 +217,7 @@ exports.AssignPhysio = async (req, res) => {
 
         res.status(200).json({ 
             message: `Assigned and generated ${sessionsToCreate.length} sessions (Range: ${sessionsToCreate[0].sessionCode} to ${sessionsToCreate[sessionsToCreate.length-1].sessionCode})`, 
-            AssignPhysio: updatedPatient 
+            AssignPhysio: AssignPhysio 
         });
 
     } catch (error) {
