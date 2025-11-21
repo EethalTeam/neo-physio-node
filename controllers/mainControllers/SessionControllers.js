@@ -7,7 +7,7 @@ const Session = require('../../model/masterModels/Session')
 exports.createSession = async (req, res) => {
     try {
         const {
-            sessionCode,
+          
             patientId,
             physioId,
             sessionDate,
@@ -27,6 +27,18 @@ exports.createSession = async (req, res) => {
             targetArea,
             media
         } = req.body;
+
+        //Automatic code genrate
+
+         const lastSession = await Session.findOne({}, {}, { sort: { 'createdAt': -1 } });
+    let nextSessionNumber = 1;
+    
+    if (lastSession && lastSession.sessionCode) {
+      const lastNumber = parseInt(lastSession.sessionCode.replace('SESSION', ''));
+      nextSessionNumber = isNaN(lastNumber) ? 1 : lastNumber + 1;
+    }
+    
+    const sessionCode = `SESSION${String(nextSessionNumber).padStart(3, '0')}`;
 
         // Create and save the Session
         const session = new Session({
@@ -66,7 +78,14 @@ exports.createSession = async (req, res) => {
 // Get all Session
 exports.getAllSession = async (req, res) => {
     try {
-        const session = await Session.find().populate("physioId", "physioName").populate("modalitiesList.modalityId", 'modalitiesName').populate("patientId", "patientName").populate("machineId", "machineName").populate('sessionStatusId', 'sessionStatusName sessionStatusColor sessionStatusTextColor').populate('redFlags.redFlagId','redflagName')
+        const {sessionDate,nextDate} = req.body
+        let filter={}
+        console.log(sessionDate,"sessionDate")
+        if(sessionDate){
+            filter.sessionDate={$gte:sessionDate,$lt:nextDate}
+        }
+        console.log(filter,"filter")
+        const session = await Session.find(filter).populate("physioId", "physioName").populate("modalitiesList.modalityId", 'modalitiesName').populate("patientId", "patientName").populate("machineId", "machineName").populate('sessionStatusId', 'sessionStatusName sessionStatusColor sessionStatusTextColor').populate('redFlags.redFlagId','redflagName')
         if (!session) {
             res.status(400).json({ message: "Session is not found" })
         }
