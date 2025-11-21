@@ -35,7 +35,7 @@ exports.createSessionStatus = async (req, res) => {
 exports.getAllSessionStatus = async (req, res) => {
     try {
         const sessionStatus = await SessionStatus.find()
-        res.status(200).json(sessionStatus)
+
         if(!sessionStatus){
             return res.status(400).json({message:"SessionStatus is not find"})
         }  

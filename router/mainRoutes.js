@@ -5,6 +5,7 @@ const LeadControllers = require("../controllers/mainControllers/LeadControllers"
 const physioControllers = require("../controllers/maincontrollers/PhysioControllers")
 const PatientControllers = require('../controllers/maincontrollers/PatientControllers')
 const ExpenseControllers = require('../controllers/maincontrollers/ExpenseControllers')
+const SessionControllers = require('../controllers/maincontrollers/SessionControllers')
 
 
 //Leads
@@ -39,6 +40,14 @@ router.post('/Expense/getAllExpense',ExpenseControllers.getAllExpense)
 router.post('/Expense/getSingleExpense',ExpenseControllers.getSingleExpense)
 router.post('/Expense/updateExpense',ExpenseControllers.updateExpense)
 router.post('/Expense/deleteExpense',ExpenseControllers.deleteExpense)
+
+
+//SessionControllers
+router.post('/Session/createSession',SessionControllers.createSession)
+router.post('/Session/getAllSession',SessionControllers.getAllSession)
+router.post('/Session/getSingleSession',SessionControllers.getSingleSession)
+router.post('/Session/updateSession',SessionControllers.updateSession)
+router.post('/Session/deleteSession',SessionControllers.deleteSession)
 
 
 

@@ -78,7 +78,7 @@ const sessionSchema = new mongoose.Schema({
   modalitiesList: [{
     modalityId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Modality' 
+      ref: 'Modalitie' 
     },
     isOccurred: {
       type: Boolean,
@@ -88,9 +88,14 @@ const sessionSchema = new mongoose.Schema({
   targetArea: {
     type: String,
     trim: true
+  },
+  media:{
+     type: String,
   }
 }, {
   timestamps: true
 });
 
-module.exports = mongoose.model('Session', sessionSchema);
+
+const SessionModel =  mongoose.model('Session', sessionSchema);
+module.exports = SessionModel

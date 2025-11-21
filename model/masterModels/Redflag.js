@@ -26,6 +26,6 @@ const RedflagSchema = new mongoose.Schema(
 );
 
 // Create the Redflag Model
-const Redflag = mongoose.model('Redflag', RedflagSchema);
+const Redflag = mongoose.model('RedFlag', RedflagSchema);
 
 module.exports = Redflag;

@@ -35,7 +35,7 @@ exports.createModalities = async (req, res) => {
 exports.getAllModalities = async (req, res) => {
     try {
         const modalities = await Modalities.find()
-        res.status(200).json(modalities)
+        
         if(!modalities){
             return res.status(400).json({message:"Modalities is not find"})
         }  
