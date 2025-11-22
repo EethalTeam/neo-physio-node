@@ -49,6 +49,11 @@ router.post('/Session/getSingleSession',SessionControllers.getSingleSession)
 router.post('/Session/updateSession',SessionControllers.updateSession)
 router.post('/Session/deleteSession',SessionControllers.deleteSession)
 
+//Session Start and End
+
+router.post('/Session/SessionStart',SessionControllers.SessionStart)
+router.post('/Session/SessionEnd',SessionControllers.SessionEnd)
+
 
 
 module.exports =router;

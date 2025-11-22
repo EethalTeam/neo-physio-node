@@ -1,6 +1,6 @@
 const mongoose = require('mongoose')
 const Session = require('../../model/masterModels/Session')
-
+const SessionStatus = require('../../model/masterModels/SessionStatus')
 
 
 // Create a new Session
@@ -192,7 +192,7 @@ exports.deleteSession = async (req, res) => {
         const session = await Session.findByIdAndDelete(_id);
 
         if (!session) {
-            return res.status(400).json({ message: 'Session not found' });
+            return res.status(400).json({ message: 'Session not able to deleted' });
         }
 
         res.status(200).json({ message: 'Session deleted successfully' });
@@ -202,6 +202,48 @@ exports.deleteSession = async (req, res) => {
 };
 
 
+
+//Session Start Controller
+ 
+exports.SessionStart = async (req,res) => {
+    try {
+        const {_id,sessionFromTime,action} = req.body
+        
+        const Status = await SessionStatus.findOne({sessionStatusName:action})
+        if(!Status){
+             res.status(400).json({message:"Session Status is not found"})
+        }
+        const session = await Session.findByIdAndUpdate(_id,{ 
+            $set:
+            {sessionFromTime:sessionFromTime,sessionStatusId:Status._id}
+         },{new:true,runValidators: true})
+        if(!session){
+            res.status(400).json({message:"Session not started"})
+        }
+        res.status(200).json(session)
+    } catch (error) {
+          res.status(500).json({ message: error.message });
+    }
+}
+
+
+//Session End Controllers
+
+exports.SessionEnd = async (req,res) => {
+    try {
+        const {_id,machineId,sessionFeedbackPros,sessionFeedbackCons,redFlags,targetArea,modalityId} = req.body
+        const session = await Session.findByIdAndUpdate(_id,
+           { $set:
+            {machineId,sessionFeedbackPros,sessionFeedbackCons,redFlags,targetArea,modalityId}
+        },{new:true,runValidators: true})
+        if(!session){
+            res.status(400).json({message:"Session End is not found"})
+        }
+        res.status(200).json(session)
+    } catch (error) {
+          res.status(500).json({ message: error.message });
+    }
+}
 
 
 
