@@ -53,4 +53,5 @@ const petrolAllowanceSchema = new mongoose.Schema({
 
 petrolAllowanceSchema.index({ physioId: 1, date: 1 }, { unique: true });
 
-module.exports = mongoose.model('PetrolAllowance', petrolAllowanceSchema);
+const PetrolAllowanceModel = mongoose.model('PetrolAllowance', petrolAllowanceSchema)
+module.exports = PetrolAllowanceModel

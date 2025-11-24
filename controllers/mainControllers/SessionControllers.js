@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const Session = require('../../model/masterModels/Session')
 const SessionStatus = require('../../model/masterModels/SessionStatus')
+const Patient = require('../../model/masterModels/Patient')
 const PetrolAllowance = require('../../model/masterModels/PetrolAllowance')
 
 
