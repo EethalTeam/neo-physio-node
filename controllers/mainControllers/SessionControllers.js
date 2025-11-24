@@ -231,10 +231,17 @@ exports.SessionStart = async (req,res) => {
 
 exports.SessionEnd = async (req,res) => {
     try {
-        const {_id,machineId,sessionFeedbackPros,sessionFeedbackCons,redFlags,targetArea,modalityId} = req.body
+        const {_id,machineId,sessionFeedbackPros,redFlags,targetArea,modalities,modalitiesList,sessionToTime,action} = req.body
+        // console.log(_id,machineId,sessionFeedbackPros,redFlags,targetArea,modalities,modalitiesList,sessionToTime,action,"_id,machineId,sessionFeedbackPros,sessionFeedbackCons,redFlags,targetArea,modalityId,sessionToTime,action")
+        //  res.status(200).json("testing")
+        const Status =  await SessionStatus.findOne({sessionStatusName:action})
+        if(!Status){
+                 res.status(400).json({message:"Session Status is not found"})
+        }
+
         const session = await Session.findByIdAndUpdate(_id,
            { $set:
-            {machineId,sessionFeedbackPros,sessionFeedbackCons,redFlags,targetArea,modalityId}
+            {machineId,sessionFeedbackPros,redFlags,targetArea,modalities,modalitiesList,sessionStatusId:Status._id,sessionToTime:sessionToTime}
         },{new:true,runValidators: true})
         if(!session){
             res.status(400).json({message:"Session End is not found"})
