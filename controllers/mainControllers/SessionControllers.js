@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 const Session = require('../../model/masterModels/Session')
 const SessionStatus = require('../../model/masterModels/SessionStatus')
+const PetrolAllowance = require('../../model/masterModels/PetrolAllowance')
 
 
 // Create a new Session
@@ -229,29 +230,109 @@ exports.SessionStart = async (req,res) => {
 
 //Session End Controllers
 
-exports.SessionEnd = async (req,res) => {
+exports.SessionEnd = async (req, res) => {
     try {
-        const {_id,machineId,sessionFeedbackPros,redFlags,targetArea,modalities,modalitiesList,sessionToTime,action} = req.body
-        // console.log(_id,machineId,sessionFeedbackPros,redFlags,targetArea,modalities,modalitiesList,sessionToTime,action,"_id,machineId,sessionFeedbackPros,sessionFeedbackCons,redFlags,targetArea,modalityId,sessionToTime,action")
-        //  res.status(200).json("testing")
-        const Status =  await SessionStatus.findOne({sessionStatusName:action})
-        if(!Status){
-                 res.status(400).json({message:"Session Status is not found"})
+        const {
+            _id,
+            machineId,
+            sessionFeedbackPros,
+            redFlags,
+            targetArea,
+            modalities,
+            modalitiesList,
+            sessionToTime,
+            action // e.g., "Completed", "Patient Absent"
+        } = req.body;
+
+        // 1. Validate Status
+        const Status = await SessionStatus.findOne({ sessionStatusName: action });
+        if (!Status) {
+            return res.status(400).json({ message: "Session Status is not found" });
         }
 
-        const session = await Session.findByIdAndUpdate(_id,
-           { $set:
-            {machineId,sessionFeedbackPros,redFlags,targetArea,modalities,modalitiesList,sessionStatusId:Status._id,sessionToTime:sessionToTime}
-        },{new:true,runValidators: true})
-        if(!session){
-            res.status(400).json({message:"Session End is not found"})
+        // 2. Update Session (Standard Logic)
+        const session = await Session.findByIdAndUpdate(
+            _id,
+            {
+                $set: {
+                    machineId,
+                    sessionFeedbackPros,
+                    redFlags,
+                    targetArea,
+                    modalities,
+                    modalitiesList,
+                    sessionStatusId: Status._id,
+                    sessionToTime: sessionToTime
+                }
+            },
+            { new: true, runValidators: true }
+        );
+
+        if (!session) {
+            return res.status(400).json({ message: "Session End is not found" });
         }
-        res.status(200).json(session)
+
+        // ---------------------------------------------------------
+        // 3. PETROL ALLOWANCE LOGIC
+        // ---------------------------------------------------------
+        
+        // A. Fetch Patient to get Distance details
+        const patient = await Patient.findById(session.patientId);
+        
+        if (patient) {
+            let kmsToAdd = 0;
+
+            // Logic based on Visit Order
+            if (patient.visitOrder === 1) {
+                // CASE 1: First Patient -> Add 'KmsfromHub'
+                kmsToAdd = patient.KmsfromHub || 0;
+            } else {
+                // CASE 2: Middle Patients -> Add 'kmsFromPrevious'
+                kmsToAdd = patient.kmsFromPrevious || 0;
+            }
+
+            // CASE 3: Check if this is the Last Patient (Return Trip)
+            // Logic: If 'KmsfLPatienttoHub' exists and is > 0, we treat this as the closing trip
+            // This allows accurate calculation regardless of the exact visitOrder number
+            if (patient.KmsfLPatienttoHub && patient.KmsfLPatienttoHub > 0) {
+                kmsToAdd += patient.KmsfLPatienttoHub;
+            }
+
+            // B. Determine the Allowance Date
+            // We need to match the Date format used in AssignPhysio (Noon time to avoid timezone issues)
+            const allowanceDate = new Date(session.sessionDate);
+            allowanceDate.setHours(12, 0, 0, 0);
+
+            // C. Update the PetrolAllowance Table
+            // We assume "Completed" sessions go to completedKms. 
+            // If you have a specific status for "Canceled upon arrival", you can add logic to update 'canceledKms' instead.
+            
+            await PetrolAllowance.findOneAndUpdate(
+                { 
+                    physioId: session.physioId, 
+                    date: allowanceDate 
+                },
+                { 
+                    $inc: { 
+                        completedKms: kmsToAdd, 
+                        finalDailyKms: kmsToAdd 
+                    } 
+                },
+                { 
+                    new: true, 
+                    upsert: true // Create the record if it doesn't exist yet
+                }
+            );
+        }
+        // ---------------------------------------------------------
+
+        res.status(200).json(session);
+
     } catch (error) {
-          res.status(500).json({ message: error.message });
+        console.error("Error Ending Session:", error);
+        res.status(500).json({ message: error.message });
     }
-}
-
+};
 
 
 
