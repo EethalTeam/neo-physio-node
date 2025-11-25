@@ -6,6 +6,7 @@ const physioControllers = require("../controllers/maincontrollers/PhysioControll
 const PatientControllers = require('../controllers/maincontrollers/PatientControllers')
 const ExpenseControllers = require('../controllers/maincontrollers/ExpenseControllers')
 const SessionControllers = require('../controllers/maincontrollers/SessionControllers')
+const PetrolAllowanceControllers = require('../controllers/maincontrollers/PetrolAllowanceControllers')
 
 
 //Leads
@@ -53,6 +54,11 @@ router.post('/Session/deleteSession',SessionControllers.deleteSession)
 
 router.post('/Session/SessionStart',SessionControllers.SessionStart)
 router.post('/Session/SessionEnd',SessionControllers.SessionEnd)
+router.post('/Session/SessionCancel',SessionControllers.SessionCancel)
+
+//PetrolAllowanceControllers
+
+router.post('/PetrolAllowance/getAllPetrolAllowance',PetrolAllowanceControllers.getAllPetrol)
 
 
 

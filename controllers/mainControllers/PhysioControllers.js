@@ -22,7 +22,9 @@ exports.createPhysio = async (req, res) => {
             physioIncentive,
             isActive,
             physioNote,
-            physioDescription
+            physioDescription,
+             password,
+            roleId,
         } = req.body;
   
     const lastPhysio = await Physio.findOne({}, {}, { sort: { 'createdAt': -1 } });
@@ -54,7 +56,10 @@ exports.createPhysio = async (req, res) => {
             physioIncentive,
             isActive,
             physioNote,
-            physioDescription
+            physioDescription,
+            password,
+            roleId
+
         });
         
         const savedPhysio = await newPhysio.save();
@@ -78,7 +83,7 @@ exports.getAllPhysios = async (req, res) => {
         const skip = (page - 1) * limit;
 
         const physios = await Physio.find({}) 
-            .populate('physioGenderId')
+            .populate('physioGenderId','roleId')
             .skip(skip)
             .limit(limit)
             .sort({ createdAt: -1 });

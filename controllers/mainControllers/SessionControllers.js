@@ -228,6 +228,67 @@ exports.SessionStart = async (req,res) => {
     }
 }
 
+//Session Canceled
+exports.SessionCancel = async (req,res)=>{
+    try {
+        const {_id,action,cancelledKms} = req.body
+         const Status = await SessionStatus.findOne({sessionStatusName:action})
+        if(!Status){
+             res.status(400).json({message:"Session Status is not found"})
+        }
+        const session = await Session.findByIdAndUpdate(_id,{
+            $set:
+            {sessionStatusId:Status._id}
+        },{new:true,runValidators:true})
+        if(!session){
+             res.status(400).json({message:"Session not Cancel"})
+        }
+
+            res.status(200).json(session)
+    
+         const patient = await Patient.findById(session.patientId);
+             if (patient) {
+            let kmsToAdd = 0;
+
+            // Logic based on Visit Order
+         
+  if (patient.KmsfLPatienttoHub && patient.KmsfLPatienttoHub > 0) {
+                kmsToAdd += patient.KmsfLPatienttoHub;
+            }
+             const allowanceDate = new Date(session.sessionDate);
+            allowanceDate.setHours(12, 0, 0, 0);
+
+            // C. Update the PetrolAllowance Table
+            // We assume "Completed" sessions go to completedKms. 
+            // If you have a specific status for "Canceled upon arrival", you can add logic to update 'canceledKms' instead.
+            console.log(kmsToAdd,"kmstoadd")
+            await PetrolAllowance.findOneAndUpdate(
+                { 
+                    physioId: session.physioId, 
+                    date: allowanceDate 
+                },
+                { 
+                    $inc: { 
+                        completedKms: kmsToAdd,
+                        canceledKms: cancelledKms, 
+                        finalDailyKms: kmsToAdd 
+                    } 
+                },
+                { 
+                    new: true, 
+                    upsert: true // Create the record if it doesn't exist yet
+                }
+            );
+        }
+
+
+      
+
+    } catch (error) {
+         res.status(500).json({ message: error.message });
+    }
+}
+
 
 //Session End Controllers
 
@@ -268,7 +329,8 @@ exports.SessionEnd = async (req, res) => {
             },
             { new: true, runValidators: true }
         );
-
+            
+        
         if (!session) {
             return res.status(400).json({ message: "Session End is not found" });
         }
@@ -279,7 +341,7 @@ exports.SessionEnd = async (req, res) => {
         
         // A. Fetch Patient to get Distance details
         const patient = await Patient.findById(session.patientId);
-        
+        console.log(patient,"patient")
         if (patient) {
             let kmsToAdd = 0;
 
@@ -307,7 +369,7 @@ exports.SessionEnd = async (req, res) => {
             // C. Update the PetrolAllowance Table
             // We assume "Completed" sessions go to completedKms. 
             // If you have a specific status for "Canceled upon arrival", you can add logic to update 'canceledKms' instead.
-            
+            console.log(kmsToAdd,"kmstoadd")
             await PetrolAllowance.findOneAndUpdate(
                 { 
                     physioId: session.physioId, 

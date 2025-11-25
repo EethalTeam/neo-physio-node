@@ -89,7 +89,17 @@ const physioSChema = new mongoose.Schema({
     physioDescription: {
         type: String,
         trim: true
-    }
+    },
+    password: {
+        type: String,
+        trim: true,
+
+    },
+    roleId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "RoleBased"         // master table
+    },
+
 }, {
     timestamps: true
 });
