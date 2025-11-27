@@ -301,12 +301,9 @@ exports.SessionCancel = async (req,res)=>{
 
 exports.SessionEnd = async (req, res) => {
     try {
-            if(req.body.machineId === '' || req.body.machineId === undefined ){
-            req.body.machineId = null
-        }
         const {
             _id,
-            
+            machineId,
             sessionFeedbackPros,
             redFlags,
             targetArea,
@@ -316,7 +313,19 @@ exports.SessionEnd = async (req, res) => {
             action // e.g., "Completed", "Patient Absent"
         } = req.body;
 
-    
+    let sessionend={
+ _id,
+            sessionFeedbackPros,
+            redFlags,
+            targetArea,
+            modalities,
+            modalitiesList,
+            sessionToTime,
+            action
+    }
+    if(machineId){
+        sessionend.machineId=machineId
+    }
 
         // 1. Validate Status
         const Status = await SessionStatus.findOne({ sessionStatusName: action });
@@ -328,16 +337,7 @@ exports.SessionEnd = async (req, res) => {
         const session = await Session.findByIdAndUpdate(
             _id,
             {
-                $set: {
-                    machineId :req.body.machineId ,
-                    sessionFeedbackPros,
-                    redFlags,
-                    targetArea,
-                    modalities,
-                    modalitiesList,
-                    sessionStatusId: Status._id,
-                    sessionToTime: sessionToTime
-                }
+                $set: sessionend
             },
             { new: true, runValidators: true }
         );
