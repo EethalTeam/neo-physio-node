@@ -36,13 +36,11 @@ const sessionSchema = new mongoose.Schema({
   },
   machineId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Machine',
-    default: false
+    ref: 'Machine'
   },
   sessionStatusId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'SessionStatus', 
-    default: null
+    ref: 'SessionStatus'
   },
   sessionFeedbackPros: {
     type: String,

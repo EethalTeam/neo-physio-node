@@ -212,11 +212,11 @@ exports.QualifyLead = async (req, res) => {
         let nextPatientNumber = 1;
 
         if (lastPatient && lastPatient.patientCode) {
-            const lastNumber = parseInt(lastPatient.patientCode.replace('Patient', ''));
+            const lastNumber = parseInt(lastPatient.patientCode.replace('PAT', ''));
             nextPatientNumber = isNaN(lastNumber) ? 1 : lastNumber + 1;
         }
 
-        const patientCode = `Patient${String(nextPatientNumber).padStart(5, '0')}`;
+        const patientCode = `PAT${String(nextPatientNumber).padStart(6, '0')}`;
 
         const patients = new Patient({
             patientName: leadName,
