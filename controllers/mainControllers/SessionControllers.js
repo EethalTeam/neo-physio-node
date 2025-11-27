@@ -124,9 +124,7 @@ exports.getSingleSession = async (req, res) => {
 // Update a Session
 exports.updateSession = async (req, res) => {
     try {
-          if(req.body.machineId === '' || req.body.machineId === undefined ){
-            req.body.machineId = null
-          }
+          
         const { _id,
             sessionCode,
             patientId,
@@ -161,7 +159,6 @@ exports.updateSession = async (req, res) => {
                     sessionTime,
                     sessionFromTime,
                     sessionToTime,
-                     machineId :req.body.machineId ,
                     sessionStatusId,
                     sessionFeedbackPros,
                     sessionFeedbackCons,
