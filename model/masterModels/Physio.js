@@ -97,7 +97,8 @@ const physioSChema = new mongoose.Schema({
     },
     roleId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "RoleBased"         // master table
+        ref: "RoleBased",         // master table
+        required:false
     },
 
 }, {

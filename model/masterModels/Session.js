@@ -37,7 +37,7 @@ const sessionSchema = new mongoose.Schema({
   machineId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Machine',
-    default: null
+    default: false
   },
   sessionStatusId: {
     type: mongoose.Schema.Types.ObjectId,

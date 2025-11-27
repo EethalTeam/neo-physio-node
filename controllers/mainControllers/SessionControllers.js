@@ -294,9 +294,12 @@ exports.SessionCancel = async (req,res)=>{
 
 exports.SessionEnd = async (req, res) => {
     try {
+            if(req.body.machineId === '' || req.body.machineId === undefined ){
+            req.body.machineId = null
+        }
         const {
             _id,
-            machineId,
+            
             sessionFeedbackPros,
             redFlags,
             targetArea,
@@ -305,6 +308,8 @@ exports.SessionEnd = async (req, res) => {
             sessionToTime,
             action // e.g., "Completed", "Patient Absent"
         } = req.body;
+
+    
 
         // 1. Validate Status
         const Status = await SessionStatus.findOne({ sessionStatusName: action });
@@ -317,7 +322,7 @@ exports.SessionEnd = async (req, res) => {
             _id,
             {
                 $set: {
-                    machineId,
+                    machineId :req.body.machineId ,
                     sessionFeedbackPros,
                     redFlags,
                     targetArea,

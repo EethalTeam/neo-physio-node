@@ -1,5 +1,5 @@
-const Role = require("../../models/masterModels/RBAC");
-const MenuRegistry = require("../../models/masterModels/MenuRegistry");
+const Role = require("../../model/masterModels/RBAC");
+const MenuRegistry = require("../../model/masterModels/MenuRegistry");
 const mongoose = require('mongoose');
 
 exports.createRole = async (req, res) => {

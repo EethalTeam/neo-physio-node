@@ -83,7 +83,7 @@ exports.getAllPhysios = async (req, res) => {
         const skip = (page - 1) * limit;
 
         const physios = await Physio.find({}) 
-            .populate('physioGenderId','roleId')
+            .populate('physioGenderId').populate('roleId','RoleName')
             .skip(skip)
             .limit(limit)
             .sort({ createdAt: -1 });
@@ -187,4 +187,110 @@ exports.deletePhysio = async (req, res) => {
         }
         res.status(500).json({ message: error.message });
     }
+};
+
+
+
+
+// LOGIN Physio
+exports.loginPhysio = async (req, res) => {
+  try {
+    const { physioCode, password } = req.body;
+
+    // 1. Reject if request is from mobile device
+    const userAgent = req.headers["user-agent"] || "";
+    const isMobile = /mobile|android|iphone|ipad|phone/i.test(userAgent);
+    if (isMobile) {
+      return res.status(403).json({ message: "Login from mobile devices is not allowed" });
+    }
+
+    // 2. Find employee by email
+    const physio = await Physio.findOne({ physioCode: physioCode }).populate("roleId","RoleName")
+    console.log(physio,"physio")
+    if (!physio) {
+      return res.status(404).json({ message: "Employee not found" });
+    }
+
+    // 4. Compare plain password (since not hashing yet)
+    if (physio.password !== password) {
+      return res.status(401).json({ message: "Invalid password" });
+    }
+
+    // 5. Mark employee as logged in
+    // physio.isCurrentlyLoggedIn = true;
+    // await physio.save();
+
+    // 6. Success
+    res.status(200).json({
+      message: "Login successful",
+      physio: {
+        _id: physio._id,
+        physioName: physio.physioName,
+        physioCode: physio.physioCode,
+        role:physio.roleId.RoleName
+      },
+    });
+
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({ message: "Login failed", error: error.message });
+  }
+};
+
+exports.logoutPhysio = async (req, res) => {
+  try {
+    const { physioCode } = req.body; // or get from token/session if you’re using auth
+
+    // 1. Find employee
+    const physio = await Physio.findOne({ email: email });
+    if (!physio) {
+      return res.status(404).json({ message: "Employee not found" });
+    }
+
+    // 2. Check if already logged out
+    if (!physio.isCurrentlyLoggedIn) {
+      return res.status(400).json({ message: "physio is already logged out" });
+    }
+
+    // 3. Update login status
+    physio.isCurrentlyLoggedIn = false;
+    await physio.save();
+
+    res.status(200).json({ message: "Logout successful" });
+  } catch (error) {
+    console.error("Logout error:", error);
+    res.status(500).json({ message: "Logout failed", error: error.message });
+  }
+};
+
+exports.logoutUser = async (_id) => {
+  try {
+    // Update lastActive or any other logout tracking if needed
+    await Physio.findByIdAndUpdate(_id, { isCurrentlyLoggedIn: false });
+
+  } catch (err) {
+    console.error("❌ Error logging out user:", err.message);
+  }
+};
+
+exports.checkLogin = async (req, res, next) => {
+  try {
+    const userId = req.headers["x-user-id"]; // userId passed from frontend
+    if (!userId) {
+      return res.status(401).json({ message: "User ID missing" });
+    }
+
+    const user = await Physio.findById(userId);
+
+    if (!user || !user.isCurrentlyLoggedIn) {
+      return res.status(401).json({ message: "User not logged in" });
+    }
+
+    // ✅ User is valid and logged in
+    req.user = user;
+    next();
+  } catch (err) {
+    console.error("checkLogin error:", err);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
 };

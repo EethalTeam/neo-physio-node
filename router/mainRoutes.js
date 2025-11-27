@@ -23,6 +23,12 @@ router.post("/Physio/getAllPhysio",physioControllers.getAllPhysios)
 router.post("/Physio/getSinglePhysio",physioControllers.getPhysioById)
 router.post("/Physio/updatePhysio",physioControllers.updatePhysio)
 router.post("/Physio/deletePhysio",physioControllers.deletePhysio)
+//physio login 
+
+router.post("/Physio/loginPhysio",physioControllers.loginPhysio)
+router.post('/Physio/logoutPhysio',physioControllers.logoutPhysio) 
+router.post('/Physio/logoutUser',physioControllers.logoutUser) 
+router.post('/Physio/checkLogin',physioControllers.checkLogin)
 
 //Patients
 router.post("/Patient/createPatient",PatientControllers.createPatients)

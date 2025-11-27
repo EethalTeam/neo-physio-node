@@ -19,6 +19,7 @@ const FeesTypeControllers = require('../controllers/mastercontrollers/FeesTypeCo
 const LeadStatusController = require('../controllers/mastercontrollers/LeadStatusControllers')
 const SessionStatusControllers = require('../controllers/mastercontrollers/SessionStatusControllers')
 const ModalitiesControllers = require('../controllers/mastercontrollers/ModalitiesControllers')
+const RBACControllers = require('../controllers/mastercontrollers/RBACControllers')
 
 
 
@@ -160,6 +161,26 @@ router.post('/Modalities/getAllModalities',ModalitiesControllers.getAllModalitie
 router.post('/Modalities/getSingleModalities',ModalitiesControllers.getModalitiesByName)
 router.post('/Modalities/updateModalities',ModalitiesControllers.updateModalities)
 router.post('/Modalities/deleteModalities',ModalitiesControllers.deleteModalities)
+
+
+//RBACControllers
+router.post('/RoleBased/createRole', RBACControllers.createRole)
+router.post('/RoleBased/deleteRole', RBACControllers.deleteRole)
+router.post('/RoleBased/updateRole', RBACControllers.updateRole)
+router.post('/RoleBased/getAllRoles', RBACControllers.getAllRoles)
+router.post('/RoleBased/getAllMenus', RBACControllers.getAllMenus)
+router.post('/RoleBased/updateMenusAndAccess', RBACControllers.updateMenusAndAccess)
+router.post('/RoleBased/getPermissions', RBACControllers.getPermissionsByRoleAndPath)
+
+
+// //MenuControllers
+// router.post('/Menu/createMenu', MenuControllers.createMenu)
+// // router.post('/Menu/insertManyMenus', MenuControllers.InsertMany)
+// router.post('/Menu/updateMenu', MenuControllers.updateMenu)
+// router.post('/Menu/getAllMenus', MenuControllers.getAllMenus)
+// router.post('/Menu/getAllParentsMenu', MenuControllers.getAllParentsMenu)
+// router.post('/Menu/getFormattedMenu', MenuControllers.getFormattedMenu)
+
 
 
 
