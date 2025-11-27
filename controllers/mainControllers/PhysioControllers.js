@@ -81,8 +81,14 @@ exports.getAllPhysios = async (req, res) => {
         const page = parseInt(req.body.page) || 1;
         const limit = parseInt(req.body.limit) || 10;
         const skip = (page - 1) * limit;
-
-        const physios = await Physio.find({}) 
+        const {type}=req.body
+        console.log(type,"type")
+        const filter={}
+        if(type===undefined){
+          filter.isActive=true
+        }
+        console.log(filter,"filter")
+        const physios = await Physio.find(filter) 
             .populate('physioGenderId').populate('roleId','RoleName')
             .skip(skip)
             .limit(limit)

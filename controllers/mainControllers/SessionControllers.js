@@ -80,11 +80,15 @@ exports.createSession = async (req, res) => {
 // Get all Session
 exports.getAllSession = async (req, res) => {
     try {
-        const {sessionDate,nextDate} = req.body
+        const {sessionDate,nextDate,physioId} = req.body
         let filter={}
         console.log(sessionDate,"sessionDate")
+          
         if(sessionDate){
             filter.sessionDate={$gte:sessionDate,$lt:nextDate}
+        }
+        if(physioId){
+            filter.physioId = physioId
         }
         console.log(filter,"filter")
         const session = await Session.find(filter).populate("physioId", "physioName").populate("modalitiesList.modalityId", 'modalitiesName').populate("patientId", "patientName").populate("machineId", "machineName").populate('sessionStatusId', 'sessionStatusName sessionStatusColor sessionStatusTextColor').populate('redFlags.redFlagId','redflagName')
@@ -120,6 +124,9 @@ exports.getSingleSession = async (req, res) => {
 // Update a Session
 exports.updateSession = async (req, res) => {
     try {
+          if(req.body.machineId === '' || req.body.machineId === undefined ){
+            req.body.machineId = null
+          }
         const { _id,
             sessionCode,
             patientId,
@@ -129,7 +136,7 @@ exports.updateSession = async (req, res) => {
             sessionTime,
             sessionFromTime,
             sessionToTime,
-            machineId,
+           
             sessionStatusId,
             sessionFeedbackPros,
             sessionFeedbackCons,
@@ -154,7 +161,7 @@ exports.updateSession = async (req, res) => {
                     sessionTime,
                     sessionFromTime,
                     sessionToTime,
-                    machineId,
+                     machineId :req.body.machineId ,
                     sessionStatusId,
                     sessionFeedbackPros,
                     sessionFeedbackCons,
