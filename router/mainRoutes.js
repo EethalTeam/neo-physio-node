@@ -1,12 +1,12 @@
 const express = require('express')
 const router = express.Router()
 
-const LeadControllers = require("../controllers/mainControllers/LeadControllers")
-const physioControllers = require("../controllers/maincontrollers/PhysioControllers")
-const PatientControllers = require('../controllers/maincontrollers/PatientControllers')
-const ExpenseControllers = require('../controllers/maincontrollers/ExpenseControllers')
-const SessionControllers = require('../controllers/maincontrollers/SessionControllers')
-const PetrolAllowanceControllers = require('../controllers/maincontrollers/PetrolAllowanceControllers')
+const LeadControllers = require('../controllers/mainControllers/LeadControllers')
+const physioControllers = require('../controllers/mainControllers/PhysioControllers')
+const PatientControllers = require('../controllers/mainControllers/PatientControllers')
+const ExpenseControllers = require('../controllers/mainControllers/ExpenseControllers')
+const SessionControllers = require('../controllers/mainControllers/SessionControllers')
+const PetrolAllowanceControllers = require('../controllers/mainControllers/PetrolAllowanceControllers')
 
 
 //Leads

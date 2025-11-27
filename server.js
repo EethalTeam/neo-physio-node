@@ -46,7 +46,7 @@ app.use('/api', masterRoutes);
 app.use('/api', mainRoutes);
 
 app.get('/test', (req, res) => {
-  res.send("Testing mongo db url", process.env.MONGODB_URI);
+  res.send("Testing mongo db url");
 });
 
 const server = http.createServer(app);
@@ -249,7 +249,7 @@ const io = new Server(server, {
 // ---------------- MONGODB CONNECTION ----------------
 async function main() {
   try {
-    await mongoose.connect(process.env.MONGODB_URI, {
+    await mongoose.connect('mongodb+srv://eethaldev:eethaldevteam123@goldsun.pazhgof.mongodb.net/neo-physio?retryWrites=true&w=majority&appName=NEO-PHYSIO', {
       serverSelectionTimeoutMS: 30000,
       socketTimeoutMS: 45000,
       connectTimeoutMS: 30000,
