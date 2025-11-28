@@ -40,4 +40,5 @@ const menuSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-module.exports = mongoose.model("Menu", menuSchema);
+const MenuRegistry = mongoose.model("Menu", menuSchema);
+module.exports = MenuRegistry

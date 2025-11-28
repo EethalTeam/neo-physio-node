@@ -79,6 +79,7 @@ exports.updateRole = async (req, res) => {
 
     // Check if role exists
     const existingRole = await Role.findById(_id);
+    console.log(existingRole,"existingRole")
     if (!existingRole) {
       return res.status(404).json({ 
         success: false, 
@@ -190,6 +191,7 @@ exports.updateMenusAndAccess = async (req, res) => {
 
     // Find the role
     const role = await Role.findById(_id);
+    console.log(role,"role")
     if (!role) {
       return res.status(404).json({ 
         success: false, 
@@ -327,7 +329,7 @@ exports.deleteRole = async (req, res) => {
     }
 
     const role = await Role.findByIdAndDelete(_id);
-
+  console.log(role,"findByIdAndDelete")
     if (!role) {
       return res.status(404).json({ 
         success: false, 
@@ -439,7 +441,7 @@ exports.getAllRoles = async (req, res) => {
 
 exports.getPermissionsByRoleAndPath = async (req, res) => {
   try {
-    const { roleName, path } = req.body;
+    const { RoleName, path } = req.body;
 
     // 1. Find the menu by path
     const menu = await MenuRegistry.findOne({ path }).lean();
@@ -448,11 +450,12 @@ exports.getPermissionsByRoleAndPath = async (req, res) => {
     }
 
     // 2. Find the role
-    const role = await Role.findOne({ RoleName: roleName }).lean();
+    const role = await Role.findOne({ RoleName: RoleName }).lean();
+    console.log(role,"findOne")
     if (!role) {
       return res.status(404).json({ success: false, message: "Role not found" });
     }
-
+    
     // 3. Match permission by menuId
     const permission = role.permissions.find(
       (perm) => perm.menuId.toString() === menu._id.toString()
@@ -475,6 +478,8 @@ exports.getPermissionsByRoleAndPath = async (req, res) => {
         isView: permission.isView,
         isDelete: permission.isDelete,
       },
+      success:true,
+      role
     });
   } catch (err) {
     console.error("Error in getPermissionsByRoleAndPath:", err);

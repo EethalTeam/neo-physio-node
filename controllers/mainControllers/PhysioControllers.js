@@ -202,7 +202,7 @@ exports.deletePhysio = async (req, res) => {
 exports.loginPhysio = async (req, res) => {
   try {
     const { physioCode, password } = req.body;
-
+console.log(physioCode, password ,"physioCode, password ")
     // 1. Reject if request is from mobile device
     const userAgent = req.headers["user-agent"] || "";
     const isMobile = /mobile|android|iphone|ipad|phone/i.test(userAgent);
@@ -214,7 +214,7 @@ exports.loginPhysio = async (req, res) => {
     const physio = await Physio.findOne({ physioCode: physioCode }).populate("roleId","RoleName")
     console.log(physio,"physio")
     if (!physio) {
-      return res.status(404).json({ message: "Employee not found" });
+      return res.status(404).json({ message: "Invalid Employee Code" });
     }
 
     // 4. Compare plain password (since not hashing yet)
