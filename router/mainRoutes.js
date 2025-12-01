@@ -8,6 +8,7 @@ const ExpenseControllers = require('../controllers/mainControllers/ExpenseContro
 const SessionControllers = require('../controllers/mainControllers/SessionControllers')
 const PetrolAllowanceControllers = require('../controllers/mainControllers/PetrolAllowanceControllers')
 const DashBoardControllers = require('../controllers/maincontrollers/DashBoardControllers')
+const ConsulationControllers = require('../controllers/maincontrollers/ConsulationControllers')
 
 
 //Leads
@@ -69,6 +70,13 @@ router.post('/PetrolAllowance/getAllPetrolAllowance',PetrolAllowanceControllers.
 
 //DashBoardControllers
 router.post('/DashBoard/getAllDashBoard',DashBoardControllers.getAllDashBoard)
+
+//ConsulationControllers
+router.post('/Consulation/createConsulation',ConsulationControllers.createConsulation)
+router.post('/Consulation/getAllConsulation',ConsulationControllers.getAllConsulation)
+router.post('/Consulation/getSingleConsulation',ConsulationControllers.getByConsulationName)
+router.post('/Consulation/updateConsulation',ConsulationControllers.updateConsulation)
+router.post('/Consulation/deleteConsulation',ConsulationControllers.deleteConsulation)
 
 
 

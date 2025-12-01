@@ -1,0 +1,20 @@
+const mongoose = require('mongoose')
+
+const ReviewSchema = new mongoose.Schema({
+ patientId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Patient',
+  },
+  physioId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Physio',
+    },
+ ReviewDate:{
+    type:Date
+ },
+ ReviewTime:{
+    type:String
+ }
+},{timestamps:true})
+const ReviewModel = mongoose.model('Review',ReviewSchema)
+module.exports=ReviewModel
