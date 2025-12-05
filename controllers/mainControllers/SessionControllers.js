@@ -80,16 +80,17 @@ exports.createSession = async (req, res) => {
 // Get all Session
 exports.getAllSession = async (req, res) => {
     try {
-        const {sessionDate,nextDate,physioId} = req.body
+        const {sessionDate,nextDate,physioId,storedRole} = req.body
         let filter={}
         console.log(sessionDate,"sessionDate")
           
         if(sessionDate){
             filter.sessionDate={$gte:sessionDate,$lt:nextDate}
         }
-        if(physioId){
+        if(physioId && storedRole !== 'SuperAdmin' &&  storedRole !== 'Admin' && storedRole !== 'HOD' ){
             filter.physioId = physioId
         }
+        
         console.log(filter,"filter")
         const session = await Session.find(filter).populate("physioId", "physioName").populate("modalitiesList.modalityId", 'modalitiesName').populate("patientId", "patientName").populate("machineId", "machineName").populate('sessionStatusId', 'sessionStatusName sessionStatusColor sessionStatusTextColor').populate('redFlags.redFlagId','redflagName')
         if (!session) {

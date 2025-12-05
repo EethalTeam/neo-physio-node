@@ -24,7 +24,7 @@ exports.getAllDashBoard = async (req, res) => {
         }
 
         if (!filter) {
-            res.status(400).json({ message: "Error from backend Dashboard getAllDash" })
+            return res.status(400).json({ message: "Error from backend Dashboard getAllDash" })
         }
         res.status(200).json(filter)
     } catch (error) {
