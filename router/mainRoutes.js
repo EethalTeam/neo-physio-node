@@ -7,9 +7,9 @@ const PatientControllers = require('../controllers/mainControllers/PatientContro
 const ExpenseControllers = require('../controllers/mainControllers/ExpenseControllers')
 const SessionControllers = require('../controllers/mainControllers/SessionControllers')
 const PetrolAllowanceControllers = require('../controllers/mainControllers/PetrolAllowanceControllers')
-const DashBoardControllers = require('../controllers/maincontrollers/DashBoardControllers')
-const ConsultationControllers = require('../controllers/maincontrollers/ConsultationControllers')
-const ReviewControllers = require('../controllers/maincontrollers/ReviewControllers')
+const DashBoardControllers = require('../controllers/mainControllers/DashBoardControllers')
+const ConsultationControllers = require('../controllers/mainControllers/ConsultationControllers')
+const ReviewControllers = require('../controllers/mainControllers/ReviewControllers')
 
 
 //Leads
