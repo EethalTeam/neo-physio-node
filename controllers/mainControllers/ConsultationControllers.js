@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
-const Consulation = require('../../model/masterModels/Consulation')
+const Consultation = require('../../model/masterModels/Consultation')
 const Session = require('../../model/masterModels/Session');
 const Counter = require('../../model/masterModels/Counter')
 
 // Create a new Patient
-exports.createConsulation = async (req, res) => {
+exports.createConsultation = async (req, res) => {
     try {
         const { patientName, patientCode, isActive, consultationDate, historyOfFall, historyOfSurgery, historyOfSurgeryDetails, historyOfFallDetails,
             patientAge, patientGenderId, byStandar, Relation, patientNumber, patientAltNum, patientAddress, patientPinCode, patientCondition, physioId,
@@ -15,12 +15,12 @@ exports.createConsulation = async (req, res) => {
             FeesTypeId,feeAmount,ReferenceId
         } = req.body;
         // Check for duplicates (if needed)
-        const existingConsulate = await Consulation.findOne({ patientCode: patientCode });
+        const existingConsulate = await Consultation.findOne({ patientCode: patientCode });
         if (existingConsulate) {
             return res.status(400).json({ message: 'Consulation with this code  already exists' });
         }
         // Create and save the Patient
-        const consulate = new Consulation({
+        const consulate = new Consultation({
             patientName, patientCode, isActive, consultationDate, historyOfFall, historyOfSurgery, historyOfSurgeryDetails, historyOfFallDetails,
             patientAge, patientGenderId, byStandar, Relation, patientNumber, patientAltNum, patientAddress, patientPinCode, patientCondition, physioId,
             reviewDate, MedicalHistoryAndRiskFactor, otherMedCon, currMed, typesOfLifeStyle, smokingOrAlcohol, dietaryHabits, Contraindications
@@ -39,12 +39,12 @@ exports.createConsulation = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
-// Get all Consulation
-exports.getAllConsulation = async (req, res) => {
+// Get allConsultation
+exports.getAllConsultation = async (req, res) => {
     try {
-        const consulate = await Consulation.find().populate("patientGenderId", "genderName").populate("MedicalHistoryAndRiskFactor.RiskFactorID", "RiskFactorName").populate("physioId", "physioName")
+        const consulate = await Consultation.find().populate("patientGenderId", "genderName").populate("MedicalHistoryAndRiskFactor.RiskFactorID", "RiskFactorName").populate("physioId", "physioName")
         if (!consulate) {
-            res.status(400).json({ message: "consulate is not found" })
+          return  res.status(400).json({ message: "consulate is not found" })
         }
 
         res.status(200).json(consulate);
@@ -53,9 +53,9 @@ exports.getAllConsulation = async (req, res) => {
     }
 };
 // Get a single consulate by name
-exports.getByConsulationName = async (req, res) => {
+exports.getByConsultationName = async (req, res) => {
     try {
-        const consulate = await Consulation.findOne({ patientName: req.body.name })
+        const consulate = await Consultation.findOne({ patientName: req.body.name })
 
         if (!consulate) {
             return res.status(400).json({ message: 'consulate not found' });
@@ -67,7 +67,7 @@ exports.getByConsulationName = async (req, res) => {
     }
 };
 // Update a consulate
-exports.updateConsulation = async (req, res) => {
+exports.updateConsultation = async (req, res) => {
     try {
         const { _id, patientName, patientCode, isActive, consultationDate, historyOfFall, historyOfSurgery, historyOfSurgeryDetails, historyOfFallDetails,
             patientAge, patientGenderId, byStandar, Relation, patientNumber, patientAltNum, patientAddress, patientPinCode, patientCondition, physioId,
@@ -78,7 +78,7 @@ exports.updateConsulation = async (req, res) => {
             FeesTypeId,feeAmount,ReferenceId
         } = req.body;
 
-        const consulate = await Consulation.findByIdAndUpdate(
+        const consulate = await Consultation.findByIdAndUpdate(
             _id,
             {
                 $set: {
@@ -104,7 +104,7 @@ exports.updateConsulation = async (req, res) => {
     }
 };
 // Delete a consulate
-exports.deleteConsulation = async (req, res) => {
+exports.deleteConsultation = async (req, res) => {
     try {
 
         const { _id } = req.body;
@@ -113,7 +113,7 @@ exports.deleteConsulation = async (req, res) => {
             return res.status(400).json({ message: 'Invalid ID' });
         }
 
-        const consulate = await Consulation.findByIdAndDelete(_id);
+        const consulate = await Consultation.findByIdAndDelete(_id);
 
         if (!consulate) {
             return res.status(400).json({ message: 'consulate not found' });
@@ -143,7 +143,7 @@ exports.AssignPhysio = async (req, res) => {
             kmsFromPrevious
         } = req.body;
 
-        const AssignPhysio = await Consulation.findByIdAndUpdate(
+        const AssignPhysio = await Consultation.findByIdAndUpdate(
             _id,
             {
                 $set: {

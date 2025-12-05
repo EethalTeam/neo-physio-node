@@ -9,10 +9,10 @@ const ReviewSchema = new mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Physio',
     },
- ReviewDate:{
+ reviewDate:{
     type:Date
  },
- ReviewTime:{
+ reviewTime:{
     type:String
  }
 },{timestamps:true})

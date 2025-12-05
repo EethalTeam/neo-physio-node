@@ -15,7 +15,7 @@ const RiskFactorSubSchema = new mongoose.Schema({
 
 
 
-const ConsulationSchema = new mongoose.Schema({
+const ConsultationSchema = new mongoose.Schema({
     patientCode: {
         type: String,
         trim: true
@@ -269,5 +269,5 @@ const ConsulationSchema = new mongoose.Schema({
     }
 
 }, { timestamps: true })
-const ConsulationModel = mongoose.model(' Consulation', ConsulationSchema)
-module.exports = ConsulationModel
+const ConsultationModel = mongoose.model(' Consultation',ConsultationSchema)
+module.exports =ConsultationModel
