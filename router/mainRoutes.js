@@ -72,7 +72,7 @@ router.post('/PetrolAllowance/getAllPetrolAllowance',PetrolAllowanceControllers.
 router.post('/DashBoard/getAllDashBoard',DashBoardControllers.getAllDashBoard)
 
 //ConsultationControllers
-router.post('/Consultation/createConsulation',ConsultationControllers.createConsultation)
+router.post('/Consultation/createConsultation',ConsultationControllers.createConsultation)
 router.post('/Consultation/getAllConsultation',ConsultationControllers.getAllConsultation)
 router.post('/Consultation/getSingleConsultation',ConsultationControllers.getByConsultationName)
 router.post('/Consultation/updateConsultation',ConsultationControllers.updateConsultation)
