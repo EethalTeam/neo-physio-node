@@ -9,6 +9,7 @@ const SessionControllers = require('../controllers/mainControllers/SessionContro
 const PetrolAllowanceControllers = require('../controllers/mainControllers/PetrolAllowanceControllers')
 const DashBoardControllers = require('../controllers/maincontrollers/DashBoardControllers')
 const ConsultationControllers = require('../controllers/maincontrollers/ConsultationControllers')
+const ReviewControllers = require('../controllers/maincontrollers/ReviewControllers')
 
 
 //Leads
@@ -77,6 +78,14 @@ router.post('/Consultation/getAllConsultation',ConsultationControllers.getAllCon
 router.post('/Consultation/getSingleConsultation',ConsultationControllers.getByConsultationName)
 router.post('/Consultation/updateConsultation',ConsultationControllers.updateConsultation)
 router.post('/Consultation/deleteConsultation',ConsultationControllers.deleteConsultation)
+
+
+//ReviewControllers
+router.post('/Review/createReview',ReviewControllers.createReview)
+router.post('/Review/getAllReview',ReviewControllers.getAllReview)
+router.post('/Review/getSingleReview',ReviewControllers.getReviewById)
+router.post('/Review/updateReview',ReviewControllers.updateReview)
+router.post('/Review/deleteReview',ReviewControllers.deleteReview)
 
 
 

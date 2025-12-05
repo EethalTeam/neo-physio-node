@@ -20,7 +20,7 @@ const LeadStatusController = require('../controllers/mastercontrollers/LeadStatu
 const SessionStatusControllers = require('../controllers/mastercontrollers/SessionStatusControllers')
 const ModalitiesControllers = require('../controllers/mastercontrollers/ModalitiesControllers')
 const RBACControllers = require('../controllers/mastercontrollers/RBACControllers')
-const ReviewControllers = require('../controllers/maincontrollers/ReviewControllers')
+
 
 
 
@@ -174,12 +174,7 @@ router.post('/RoleBased/updateMenusAndAccess', RBACControllers.updateMenusAndAcc
 router.post('/RoleBased/getPermissions', RBACControllers.getPermissionsByRoleAndPath)
 
 
-//ReviewControllers
-router.post('/Review/createReview',ReviewControllers.createReview)
-router.post('/Review/getAllReview',ReviewControllers.getAllReview)
-router.post('/Review/getSingleReview',ReviewControllers.getReviewById)
-router.post('/Review/updateReview',ReviewControllers.updateReview)
-router.post('/Review/deleteReview',ReviewControllers.deleteReview)
+
 
 
 
