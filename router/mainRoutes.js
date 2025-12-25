@@ -8,7 +8,7 @@ const ExpenseControllers = require('../controllers/mainControllers/ExpenseContro
 const SessionControllers = require('../controllers/mainControllers/SessionControllers')
 const PetrolAllowanceControllers = require('../controllers/mainControllers/PetrolAllowanceControllers')
 const DashBoardControllers = require('../controllers/mainControllers/DashBoardControllers')
-
+const ReviewTypeControllers= require('../controllers/mainControllers/ReviewTypeControllers')
 const ReviewControllers = require('../controllers/mainControllers/ReviewControllers')
 const ConsultationControllers = require('../controllers/mainControllers/ConsultationControllers');
 
@@ -81,15 +81,10 @@ router.post('/Consultation/getAllConsultation',ConsultationControllers.getAllCon
 router.post('/Consultation/getSingleConsultation',ConsultationControllers.getByConsultationName)
 router.post('/Consultation/updateConsultation',ConsultationControllers.updateConsultation)
 router.post('/Consultation/deleteConsultation',ConsultationControllers.deleteConsultation)
+router.post('/Consultation/AssignPhysio',ConsultationControllers.AssignPhysio)
+router.post('/Consultation/revertConsultation',ConsultationControllers.revertConsultation)
 
 
-//ReviewControllers
-router.post('/Review/createReview',ReviewControllers.createReview)
-router.post('/Review/getAllReview',ReviewControllers.getAllReview)
-router.post('/Review/getSingleReview',ReviewControllers.getReviewById)
-router.post('/Review/updateReview',ReviewControllers.updateReview)
-router.post('/Review/deleteReview',ReviewControllers.deleteReview)
-
-
-
+router.post('/RedFlag/CreateRedFlag',ReviewControllers.createRedflag)
+router.post('/RedFlag/GetAllRedFlag',ReviewControllers.getAllRedflags)
 module.exports =router;

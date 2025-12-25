@@ -2,7 +2,9 @@ const mongoose = require('mongoose');
 const Consultation = require('../../model/masterModels/Consultation')
 const Session = require('../../model/masterModels/Session');
 const Counter = require('../../model/masterModels/Counter')
-
+const Patient = require('../../model/masterModels/Patient');
+const Lead = require('../../model/masterModels/Leads');
+const Leadstatus = require('../../model/masterModels/Leadstatus')
 // Create a new Patient
 exports.createConsultation = async (req, res) => {
     try {
@@ -103,6 +105,7 @@ exports.updateConsultation = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
 // Delete a consulate
 exports.deleteConsultation = async (req, res) => {
     try {
@@ -125,9 +128,37 @@ exports.deleteConsultation = async (req, res) => {
     }
 };
 
+
+exports.revertConsultation = async (req, res) => {
+  try {
+    const { id, status } = req.body;
+        const leadstatus= await Leadstatus.findOne({leadStatusName:status})
+        console.log(leadstatus,"leadstatus")
+        const consult = await Consultation.findById(id);
+        if (!consult) {
+            return res.status(404).json({ message: 'Consultation not found' });
+        }else{
+            const lead=await Lead.findOne({_id:new mongoose.Types.ObjectId(consult.leadId)})
+            lead.LeadStatusId= new mongoose.Types.ObjectId(leadstatus._id)
+            await lead.save()
+                // const consultation = await Consultation.findById(id);
+      const consultation = await Consultation.findByIdAndDelete(id);
+    if (!consultation) {
+      return res.status(404).json({ message: 'Consultation not found' });
+    }
+    res.status(200).json({
+      message: 'Consultation reverted successfully',
+      leadDetails: consultation
+    });
+        }
+  } catch (error) {
+    res.status(500).json({ message: 'Server Error' });
+  }
+};
+
 exports.AssignPhysio = async (req, res) => {
     try {
-        const {
+          const {
             _id,
             sessionStartDate,
             sessionTime,
@@ -168,6 +199,43 @@ exports.AssignPhysio = async (req, res) => {
             return res.status(400).json({ message: 'AssignPhysio Cant able to update' });
         }
 
+        const ExistingConsultation = await Consultation.findById(_id);
+
+        if (!ExistingConsultation) {
+            return res.status(400).json({ message: 'Consultation not found , Cannot assign physio' });
+        }
+
+        // 🔥 UPDATE PATIENT (THIS WAS MISSING)
+
+        const { patientName, patientCode, isActive, consultationDate, historyOfFall, historyOfSurgery, historyOfSurgeryDetails, historyOfFallDetails,
+            patientAge, patientGenderId, byStandar, Relation, patientNumber, patientAltNum, patientAddress, patientPinCode, patientCondition,
+            reviewDate, MedicalHistoryAndRiskFactor, otherMedCon, currMed, typesOfLifeStyle, smokingOrAlcohol, dietaryHabits, Contraindications
+            , painLevel, rangeOfMotion, muscleStrength, postureOrGaitAnalysis, functionalLimitations, ADLAbility, shortTermGoals,
+            longTermGoals, RecomTherapy, Frequency, Duration, noOfDays, Modalities, targetedArea, hodNotes, Physiotherapist,
+             Feedback, Satisfaction,
+            FeesTypeId,feeAmount,ReferenceId
+        } = ExistingConsultation;
+        // Check for duplicates (if needed)
+        const existingPatient = await Patient.findOne({ patientNumber: patientNumber });
+        if (existingPatient) {
+            return res.status(400).json({ message: 'Patient with this mobile number already exists' });
+        }
+        // Create and save the Patient
+        const patients = new Patient({
+            patientName, patientCode, isActive, consultationDate, historyOfFall, historyOfSurgery, historyOfSurgeryDetails, historyOfFallDetails,
+            patientAge, patientGenderId, byStandar, Relation, patientNumber, patientAltNum, patientAddress, patientPinCode, patientCondition, physioId,
+            reviewDate, MedicalHistoryAndRiskFactor, otherMedCon, currMed, typesOfLifeStyle, smokingOrAlcohol, dietaryHabits, Contraindications
+            , painLevel, rangeOfMotion, muscleStrength, postureOrGaitAnalysis, functionalLimitations, ADLAbility, shortTermGoals, goalDescription,
+            longTermGoals, RecomTherapy, Frequency, Duration, noOfDays, Modalities, targetedArea, hodNotes, Physiotherapist, sessionStartDate, sessionTime,
+            totalSessionDays, InitialShorttermGoal, goalDuration, visitOrder, KmsfromHub, KmsfLPatienttoHub, Feedback, Satisfaction, kmsFromPrevious, reviewFrequency,
+            FeesTypeId, feeAmount,ReferenceId
+        });
+           await patients.save();
+           
+          if (!patients) {
+            return res.status(400).json({ message: 'Failed to create patient' });
+        }
+
         const counter = await Counter.findByIdAndUpdate(
             { _id: 'sessionCode' },
             { $inc: { seq: totalSessionDays } }, 
@@ -178,6 +246,11 @@ exports.AssignPhysio = async (req, res) => {
        
         let currentDate = new Date(sessionStartDate);
         currentDate.setHours(12, 0, 0, 0);
+const consultation = await Consultation.findById(_id);
+ if (!consultation) {
+      return res.status(400).json({ message: "Consultation not found" });
+    }
+
 
         const sessionsToCreate = [];
         let sessionsGenerated = 0;
@@ -195,7 +268,7 @@ exports.AssignPhysio = async (req, res) => {
             const formattedCode = `SESS-${String(nextSequenceNumber).padStart(6, '0')}`;
 
             sessionsToCreate.push({
-                patientId: _id,
+                patientId: patients._id,
                 physioId: physioId,
                 sessionDate: new Date(currentDate), 
                 sessionTime: sessionTime, 
@@ -214,10 +287,10 @@ exports.AssignPhysio = async (req, res) => {
         if (sessionsToCreate.length > 0) {
             await Session.insertMany(sessionsToCreate);
         }
-
-        res.status(200).json({ 
-            message: `Assigned and generated ${sessionsToCreate.length} sessions (Range: ${sessionsToCreate[0].sessionCode} to ${sessionsToCreate[sessionsToCreate.length-1].sessionCode})`, 
-            AssignPhysio: AssignPhysio 
+        res.status(200).json({
+            message: `Assigned and generated ${sessionsToCreate.length} sessions`,
+            patient: patients,
+            sessions: sessionsToCreate
         });
 
     } catch (error) {

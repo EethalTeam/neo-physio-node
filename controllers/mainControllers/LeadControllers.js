@@ -1,5 +1,6 @@
 const Lead = require('../../model/masterModels/Leads');
 const Patient = require('../../model/masterModels/Patient')
+const Consultation = require('../../model/masterModels/Consultation');
 const LeadStatus = require('../../model/masterModels/Leadstatus')
 const fs = require('fs');
 const path = require('path');
@@ -208,17 +209,24 @@ exports.QualifyLead = async (req, res) => {
             ConsultationDate
         } = req.body
 
-        const lastPatient = await Patient.findOne({}, {}, { sort: { 'createdAt': -1 } });
+        const lastConsultant = await Consultation.findOne({}, {}, { sort: { 'createdAt': -1 } });
+        // const lastPatient = await Patient.findOne({}, {}, { sort: { 'createdAt': -1 } });
         let nextPatientNumber = 1;
 
-        if (lastPatient && lastPatient.patientCode) {
-            const lastNumber = parseInt(lastPatient.patientCode.replace('PAT', ''));
+        if (lastConsultant && lastConsultant.patientCode) {
+        // if (lastPatient && lastPatient.patientCode) {
+            const lastNumber = parseInt(lastConsultant.patientCode.replace('CON', ''));
+            // const lastNumber = parseInt(lastPatient.patientCode.replace('PAT', ''));
             nextPatientNumber = isNaN(lastNumber) ? 1 : lastNumber + 1;
         }
 
-        const patientCode = `PAT${String(nextPatientNumber).padStart(6, '0')}`;
+        const patientCode = `CON${String(nextPatientNumber).padStart(6, '0')}`;
+        // const patientCode = `PAT${String(nextPatientNumber).padStart(6, '0')}`;
 
-        const patients = new Patient({
+
+
+        const consult = new Consultation({
+        // const patients = new Patient({
             patientName: leadName,
             patientCode: patientCode,
             isActive: true,
@@ -227,13 +235,17 @@ exports.QualifyLead = async (req, res) => {
             otherMedCon: leadMedicalHistory,
             patientGenderId: leadGenderId._id,
             patientNumber: leadContactNo,
-            patientAddress: leadAddress
+            patientAddress: leadAddress,
+            leadId: _id
         });
         if (ReferenceId) {
-            patients.ReferenceId = new mongoose.Types.ObjectId(ReferenceId._id)
+            consult.ReferenceId = new mongoose.Types.ObjectId(ReferenceId._id)
+            // patients.ReferenceId = new mongoose.Types.ObjectId(ReferenceId._id)
         }
-        await patients.save();
-        if (patients) {
+        await consult.save();
+        // await patients.save();
+        if (consult) {
+        // if (patients) {
             const Leadstatus = await LeadStatus.findOne({ leadStatusName: 'Qualified' })
             if (Leadstatus) {
                 const lead = await Lead.findByIdAndUpdate(
@@ -255,7 +267,8 @@ exports.QualifyLead = async (req, res) => {
 
             res.status(200).json({
                 message: 'Lead qualified and Patient created successfully',
-                data: patients._id
+                data: consult._id
+                // data: patients._id
             });
         } else {
             res.status(500).json({

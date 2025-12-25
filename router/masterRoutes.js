@@ -20,7 +20,8 @@ const LeadStatusController = require('../controllers/mastercontrollers/LeadStatu
 const SessionStatusControllers = require('../controllers/mastercontrollers/SessionStatusControllers')
 const ModalitiesControllers = require('../controllers/mastercontrollers/ModalitiesControllers')
 const RBACControllers = require('../controllers/mastercontrollers/RBACControllers')
-
+const ReviewControllers = require('../controllers/mainControllers/ReviewControllers')
+const ReviewTypeControllers= require('../controllers/mainControllers/ReviewTypeControllers')
 
 
 
@@ -85,6 +86,22 @@ router.post("/References/getALLReferences",ReferencesControllers.getAllReference
 router.post("/References/getSingleReferences",ReferencesControllers.getSingleReference)
 router.post("/References/updateReferences",ReferencesControllers.updateReferences)
 router.post("/References/deleteReferences",ReferencesControllers.deleteReferences)
+
+//ReviewControllers
+router.post('/Review/createReview',ReviewControllers.createReview)
+router.post('/Review/getAllReview',ReviewControllers.getAllReview)
+router.post('/Review/getSingleReview',ReviewControllers.getReviewById)
+router.post('/Review/updateReview',ReviewControllers.updateReview)
+router.post('/Review/deleteReview',ReviewControllers.deleteReview)
+
+//Review Type Routes
+router.post('/ReviewType/createReviewType',ReviewTypeControllers.createReviewType)
+router.post('/ReviewType/getAllReviewType',ReviewTypeControllers.getAllReviewTypes)
+router.post('/ReviewType/getReviewTypeById',ReviewTypeControllers.getReviewTypeById)
+router.post('/ReviewType/updateReviewType',ReviewTypeControllers.updateReviewType)
+router.post('/ReviewType/deleteReviewType',ReviewTypeControllers.deleteReviewType)
+
+
 
 
 //ExpenseCategoryControllers 

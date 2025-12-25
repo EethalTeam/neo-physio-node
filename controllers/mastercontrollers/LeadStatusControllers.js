@@ -9,7 +9,7 @@ exports.createLeadStatus = async (req, res) => {
         // Check for duplicates (if needed)
         const existingLeadStatus = await  LeadStatus.findOne({
             $or: [
-                { leadStatusName },
+                // { leadStatusName },
                 { leadStatusCode }
             ]
         });

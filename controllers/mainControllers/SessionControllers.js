@@ -82,8 +82,7 @@ exports.getAllSession = async (req, res) => {
     try {
         const {sessionDate,nextDate,physioId,storedRole} = req.body
         let filter={}
-        console.log(sessionDate,"sessionDate")
-          
+        console.log(sessionDate,"sessionDate")        
         if(sessionDate){
             filter.sessionDate={$gte:sessionDate,$lt:nextDate}
         }
@@ -92,7 +91,14 @@ exports.getAllSession = async (req, res) => {
         }
         
         console.log(filter,"filter")
-        const session = await Session.find(filter).populate("physioId", "physioName").populate("modalitiesList.modalityId", 'modalitiesName').populate("patientId", "patientName").populate("machineId", "machineName").populate('sessionStatusId', 'sessionStatusName sessionStatusColor sessionStatusTextColor').populate('redFlags.redFlagId','redflagName')
+        const session = await Session.find(filter)
+        .populate("physioId", "physioName")
+        .populate("modalitiesList.modalityId", 'modalitiesName')
+        .populate("patientId","patientName" )
+        .populate("machineId", "machineName")
+        .populate('sessionStatusId', 'sessionStatusName sessionStatusColor sessionStatusTextColor')
+        .populate('redFlags.redFlagId','redflagName')
+        console.log(session,"session")
         if (!session) {
             res.status(400).json({ message: "Session is not found" })
         }

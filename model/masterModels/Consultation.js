@@ -95,6 +95,10 @@ const ConsultationSchema = new mongoose.Schema({
         trim: true
 
     },
+    leadId:{
+        type: String,
+        trim:true
+    },
     typesOfLifeStyle: {
         type: String,
         trim: true,
@@ -269,5 +273,5 @@ const ConsultationSchema = new mongoose.Schema({
     }
 
 }, { timestamps: true })
-const ConsultationModel = mongoose.model(' Consultation',ConsultationSchema)
+const ConsultationModel = mongoose.model('Consultation',ConsultationSchema)
 module.exports =ConsultationModel

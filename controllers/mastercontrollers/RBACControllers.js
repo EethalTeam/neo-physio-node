@@ -451,7 +451,6 @@ exports.getPermissionsByRoleAndPath = async (req, res) => {
 
     // 2. Find the role
     const role = await Role.findOne({ RoleName: RoleName }).lean();
-    console.log(role,"findOne")
     if (!role) {
       return res.status(404).json({ success: false, message: "Role not found" });
     }
