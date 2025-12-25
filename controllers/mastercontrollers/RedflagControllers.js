@@ -35,7 +35,6 @@ exports.createRedflag = async (req, res) => {
 exports.getAllRedflag = async (req, res) => {
     try {
         //option 1 aggregate method
-        console.log("redflag")
         const redflag= await Redflag.aggregate([
         {
             $project:{
@@ -96,9 +95,7 @@ exports.updateRedflag= async (req, res) => {
 // Delete a Redflag
 exports.deleteRedflag = async (req, res) => {
     try {
-        console.log(req,"req.body")
         const { _id } = req.body;
-        console.log(_id,"id")
         if (!mongoose.Types.ObjectId.isValid(_id)) {
             return res.status(400).json({ message: 'Invalid ID' });
         }

@@ -82,12 +82,10 @@ exports.getAllPhysios = async (req, res) => {
         const limit = parseInt(req.body.limit) || 10;
         const skip = (page - 1) * limit;
         const {type}=req.body
-        console.log(type,"type")
         const filter={}
         if(type===undefined){
           filter.isActive=true
         }
-        console.log(filter,"filter")
         const physios = await Physio.find(filter) 
             .populate('physioGenderId').populate('roleId','RoleName')
             .skip(skip)
@@ -202,7 +200,6 @@ exports.deletePhysio = async (req, res) => {
 exports.loginPhysio = async (req, res) => {
   try {
     const { physioCode, password } = req.body;
-console.log(physioCode, password ,"physioCode, password ")
     // 1. Reject if request is from mobile device
     const userAgent = req.headers["user-agent"] || "";
     const isMobile = /mobile|android|iphone|ipad|phone/i.test(userAgent);
@@ -212,7 +209,6 @@ console.log(physioCode, password ,"physioCode, password ")
 
     // 2. Find employee by email
     const physio = await Physio.findOne({ physioCode: physioCode }).populate("roleId","RoleName")
-    console.log(physio,"physio")
     if (!physio) {
       return res.status(404).json({ message: "Invalid Employee Code" });
     }

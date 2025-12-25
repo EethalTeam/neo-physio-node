@@ -79,7 +79,6 @@ exports.updateRole = async (req, res) => {
 
     // Check if role exists
     const existingRole = await Role.findById(_id);
-    console.log(existingRole,"existingRole")
     if (!existingRole) {
       return res.status(404).json({ 
         success: false, 
@@ -191,7 +190,6 @@ exports.updateMenusAndAccess = async (req, res) => {
 
     // Find the role
     const role = await Role.findById(_id);
-    console.log(role,"role")
     if (!role) {
       return res.status(404).json({ 
         success: false, 
@@ -329,7 +327,6 @@ exports.deleteRole = async (req, res) => {
     }
 
     const role = await Role.findByIdAndDelete(_id);
-  console.log(role,"findByIdAndDelete")
     if (!role) {
       return res.status(404).json({ 
         success: false, 

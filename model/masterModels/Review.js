@@ -20,16 +20,12 @@ const ReviewSchema = new mongoose.Schema({
         ref: 'ReviewType',
         required: true 
     },
-       redflagId:{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'RedFlag',
-        required: false 
-    },
-   //  generalId:{
-   //      type: mongoose.Schema.Types.ObjectId,   
-   //      ref: 'GeneralReview',
-   //      required: false
-   //  },
+  redFlags: [{
+    redFlagId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'RedFlag' 
+    }
+  }],
     feedback: {
         type: String,
         required: true }
