@@ -27,8 +27,8 @@ const ReviewSchema = new mongoose.Schema({
     }
   }],
     feedback: {
-        type: String,
-        required: true }
+        type: String
+       }
     
 },{timestamps:true})
 const ReviewModel = mongoose.model('Review',ReviewSchema)

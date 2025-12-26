@@ -306,12 +306,12 @@ exports.SessionEnd = async (req, res) => {
             _id,
             machineId,
             sessionFeedbackPros,
-            redFlags, // Array of red flag IDs from frontend
+            redFlags, 
             targetArea,
             modalities,
             modalitiesList,
             sessionToTime,
-            action // e.g., "Completed", "Patient Absent"
+            action 
         } = req.body;
 
         let sessionend = {
@@ -321,8 +321,7 @@ exports.SessionEnd = async (req, res) => {
             targetArea,
             modalities,
             modalitiesList,
-            sessionToTime,
-            action
+            sessionToTime
         };
         
         if (machineId) {
@@ -333,8 +332,10 @@ exports.SessionEnd = async (req, res) => {
         const Status = await SessionStatus.findOne({ sessionStatusName: action });
         if (!Status) {
             return res.status(400).json({ message: "Session Status is not found" });
+        }else{
+            sessionend.sessionStatusId = Status._id;
         }
-
+         
         // 2. Update Session
         const session = await Session.findByIdAndUpdate(
             _id,
@@ -352,9 +353,9 @@ exports.SessionEnd = async (req, res) => {
         if (redFlags && redFlags.length > 0) {
             // Mapping the simple IDs from req.body to the schema structure [{ redFlagId: ... }]
             const formattedRedFlags = redFlags.map(id => ({
-                redFlagId: new mongoose.Types.ObjectId(id)
+                redFlagId: new mongoose.Types.ObjectId(id.redFlagId)
             }));
-                const reviewTypeDefault = await ReviewType.findOne({ reviewTypeName: 'RedFlags' });
+                const reviewTypeDefault = await ReviewType.findOne({ reviewTypeName: 'Red Flag' });
                 if (!reviewTypeDefault) {
                     return res.status(500).json({ message: 'Default ReviewType not found. Please create one named "Standard".' });
                 }

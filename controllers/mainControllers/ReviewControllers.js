@@ -66,7 +66,7 @@ exports.getAllReview = async (req, res) => {
       .populate("patientId", "patientName")
       .populate("physioId", "physioName")
       .populate("reviewTypeId", "reviewTypeName")
-      .populate("redflagId");
+      // .populate("redflagId");
 
     res.status(200).json(reviews);
   } catch (error) {
