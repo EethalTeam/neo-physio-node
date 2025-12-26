@@ -42,25 +42,33 @@ exports.getReviewTypeById = async (req, res) => {
     }
 };
 
-// Update Review Type
 exports.updateReviewType = async (req, res) => {
   try {
-    const { _id, reviewTypeName ,reviewTypeCode,isActive } = req.body;
-    const reviewType = await ReviewType.findByIdAndUpdate( 
-      _id,
-      { reviewTypeName,reviewTypeCode,isActive },
-      { new: true }
-    );
-    if (!reviewType) {
-        return res.status(404).json({ message: 'Review Type not found' });  
+    const { _id, reviewTypeName, reviewTypeCode, isActive } = req.body;
+
+    if (!_id) {
+      return res.status(400).json({ message: 'Review Type ID is required' });
     }
+
+    const updateData = {};
+    if (reviewTypeName !== undefined) updateData.reviewTypeName = reviewTypeName;
+    if (reviewTypeCode !== undefined) updateData.reviewTypeCode = reviewTypeCode;
+    if (isActive !== undefined) updateData.isActive = isActive;
+
+    const reviewType = await ReviewType.findByIdAndUpdate(_id, updateData, { new: true });
+
+    if (!reviewType) {
+      return res.status(404).json({ message: 'Review Type not found' });
+    }
+
     res.status(200).json({
       message: 'Review Type updated successfully',
       data: reviewType,
     });
   } catch (error) {
-    res.status(500).json({ message: error.message });
-  } 
+    console.error('Error updating review type:', error);
+    res.status(500).json({ message: 'Server error occurred' });
+  }
 };
 
 // Delete Review Type
