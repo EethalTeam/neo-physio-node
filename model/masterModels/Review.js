@@ -28,8 +28,13 @@ const ReviewSchema = new mongoose.Schema({
   }],
     feedback: {
         type: String
-       }
-    
+       },
+       sessionId: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "Session",
+  required: true
+}
+
 },{timestamps:true})
 const ReviewModel = mongoose.model('Review',ReviewSchema)
 module.exports=ReviewModel

@@ -1,12 +1,12 @@
 const mongoose = require("mongoose");
 const Review = require("../../model/masterModels/Review");
 const RedFlag = require("../../model/masterModels/Redflag");
-// Create a new Review
 exports.createReview = async (req, res) => {
   try {
     const {
       patientId,
       physioId,
+      sessionId,          // ✅ MISSING BEFORE
       reviewDate,
       reviewTime,
       reviewTypeId,
@@ -14,30 +14,55 @@ exports.createReview = async (req, res) => {
       feedback,
     } = req.body;
 
-    if (!patientId || !physioId || !reviewDate || !reviewTypeId || !feedback) {
+    // ✅ Validation
+    if (!patientId || !physioId || !sessionId || !reviewTypeId) {
       return res.status(400).json({ message: "Required fields missing" });
     }
 
+    // 🔑 CHECK EXISTING REVIEW (ONE PER SESSION)
+    const existingReview = await Review.findOne({
+      sessionId,
+      reviewTypeId
+    });
+
+    if (existingReview) {
+      existingReview.feedback = feedback;
+      existingReview.redflagId = redflagId;
+      existingReview.reviewDate = reviewDate;
+      existingReview.reviewTime = reviewTime;
+
+      await existingReview.save();
+
+      return res.status(200).json({
+        message: "Review updated successfully",
+        data: existingReview
+      });
+    }
+
+    // ✅ CREATE ONLY IF NOT EXISTS
     const review = new Review({
       patientId,
       physioId,
+      sessionId,
       reviewDate,
       reviewTime,
       reviewTypeId,
       redflagId,
-      feedback,
+      feedback
     });
 
     await review.save();
 
     res.status(200).json({
       message: "Review created successfully",
-      data: review,
+      data: review
     });
+
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
+
 exports.getAllRedflags = async (req, res) => {
   try {
     const redflags = await RedFlag.find();
