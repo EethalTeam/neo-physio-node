@@ -280,8 +280,7 @@ exports.AssignPhysio = async (req, res) => {
                     patientId: newPatient._id,
                     physioId: physioId,
                     reviewDate: currentSessionDate,
-                    reviewTypeId: new mongoose.Types.ObjectId(reviewTypeDefault._id), 
-                    feedback: `Automated review for session ${sessionsGenerated}`,
+                    reviewTypeId: new mongoose.Types.ObjectId(reviewTypeDefault._id)
                 });
             }
 

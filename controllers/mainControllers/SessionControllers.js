@@ -362,6 +362,7 @@ exports.SessionEnd = async (req, res) => {
                 patientId: session.patientId,
                 physioId: session.physioId,
                 reviewDate: session.sessionDate,
+                sessionId: session._id,
                 reviewTypeId: reviewTypeDefault._id,
                 redFlags: formattedRedFlags,
             });

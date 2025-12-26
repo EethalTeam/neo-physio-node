@@ -31,8 +31,7 @@ const ReviewSchema = new mongoose.Schema({
        },
        sessionId: {
   type: mongoose.Schema.Types.ObjectId,
-  ref: "Session",
-  required: true
+  ref: "Session"
 }
 
 },{timestamps:true})
