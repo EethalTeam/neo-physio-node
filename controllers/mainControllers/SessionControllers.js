@@ -323,7 +323,6 @@ exports.SessionEnd = async (req, res) => {
             modalitiesList,
             sessionToTime
         };
-        
         if (machineId) {
             sessionend.machineId = machineId;
         }
@@ -355,7 +354,7 @@ exports.SessionEnd = async (req, res) => {
             const formattedRedFlags = redFlags.map(id => ({
                 redFlagId: new mongoose.Types.ObjectId(id.redFlagId)
             }));
-                const reviewTypeDefault = await ReviewType.findOne({ reviewTypeName: 'Red Flag' });
+                const reviewTypeDefault = await ReviewType.findOne({ reviewTypeName: 'RedFlags' });
                 if (!reviewTypeDefault) {
                     return res.status(500).json({ message: 'Default ReviewType not found. Please create one named "Standard".' });
                 }
