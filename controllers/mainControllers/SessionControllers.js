@@ -5,7 +5,7 @@ const Patient = require('../../model/masterModels/Patient')
 const PetrolAllowance = require('../../model/masterModels/PetrolAllowance')
 const Review = require('../../model/masterModels/Review');
 const ReviewType = require('../../model/masterModels/ReviewType');
-
+const ReviewStatus =require('../../model/masterModels/ReviewStatus');
 // Create a new Session
 exports.createSession = async (req, res) => {
     try {
@@ -358,6 +358,10 @@ exports.SessionEnd = async (req, res) => {
                 if (!reviewTypeDefault) {
                     return res.status(500).json({ message: 'Default ReviewType not found. Please create one named "Standard".' });
                 }
+                 const reviewStatusDefault = await ReviewStatus.findOne({ reviewStatusName: 'Pending' });
+                if (!reviewStatusDefault) {
+                    return res.status(500).json({ message: 'Default ReviewType not found. Please create one named "Standard".' });
+                }
             await Review.create({
                 patientId: session.patientId,
                 physioId: session.physioId,
@@ -365,6 +369,7 @@ exports.SessionEnd = async (req, res) => {
                 sessionId: session._id,
                 reviewTypeId: reviewTypeDefault._id,
                 redFlags: formattedRedFlags,
+                reviewStatusId: reviewStatusDefault._id,
             });
         }
         // ---------------------------------------------------------

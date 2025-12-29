@@ -22,7 +22,7 @@ const ModalitiesControllers = require('../controllers/mastercontrollers/Modaliti
 const RBACControllers = require('../controllers/mastercontrollers/RBACControllers')
 const ReviewControllers = require('../controllers/mainControllers/ReviewControllers')
 const ReviewTypeControllers= require('../controllers/mainControllers/ReviewTypeControllers')
-
+const ReviewStatusControllers= require('../controllers/mastercontrollers/ReviewStatusController')   
 
 
 
@@ -172,6 +172,13 @@ router.post('/SessionStatus/getSingleSessionStatus',SessionStatusControllers.get
 router.post('/SessionStatus/updateSessionStatus',SessionStatusControllers.updateSessionStatus)
 router.post('/SessionStatus/deleteSessionStatus',SessionStatusControllers.deleteSessionStatus)
 
+
+//reviewStatusControllers
+router.post('/ReviewStatus/createReviewStatus',ReviewStatusControllers.createReviewStatus)
+router.post('/ReviewStatus/getAllReviewStatus',ReviewStatusControllers.getAllReviewStatus)
+router.post('/ReviewStatus/getSingleReviewStatus',ReviewStatusControllers.getLeadReviewByName)
+router.post('/ReviewStatus/updateReviewStatus',ReviewStatusControllers.updateReviewStatus)
+router.post('/ReviewStatus/deleteReviewStatus',ReviewStatusControllers.deleteReviewStatus)
 
 //ModalitiesControllers
 router.post('/Modalities/createModalities',ModalitiesControllers.createModalities)

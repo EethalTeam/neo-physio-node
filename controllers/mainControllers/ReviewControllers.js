@@ -1,23 +1,39 @@
 const mongoose = require("mongoose");
 const Review = require("../../model/masterModels/Review");
 const RedFlag = require("../../model/masterModels/Redflag");
+const ReviewStatus = require("../../model/masterModels/ReviewStatus");
+
 exports.createReview = async (req, res) => {
   try {
     const {
       patientId,
       physioId,
-      sessionId,          // ✅ MISSING BEFORE
+      sessionId,          
       reviewDate,
       reviewTime,
       reviewTypeId,
       redflagId,
       feedback,
+      reviewStatusId
     } = req.body;
+const redFlags = redflagId
+  ? [{ redFlagId: redflagId }]
+  : [];
 
-    // ✅ Validation
-    if (!patientId || !physioId || !sessionId || !reviewTypeId) {
+    //  Validation
+    if (!patientId || !physioId || !sessionId || !reviewTypeId || !reviewStatusId) {
       return res.status(400).json({ message: "Required fields missing" });
     }
+const pendingStatus = await ReviewStatus.findOne({
+  reviewStatusName: "Pending",
+  isActive: true,
+});
+
+if (!pendingStatus) {
+  return res.status(400).json({
+    message: "Pending review status not found",
+  });
+}
 
     // 🔑 CHECK EXISTING REVIEW (ONE PER SESSION)
     const existingReview = await Review.findOne({
@@ -27,9 +43,13 @@ exports.createReview = async (req, res) => {
 
     if (existingReview) {
       existingReview.feedback = feedback;
-      existingReview.redflagId = redflagId;
+      existingReview.redFlags = redFlags;
       existingReview.reviewDate = reviewDate;
       existingReview.reviewTime = reviewTime;
+
+  // ensure status always exists
+  existingReview.reviewStatusId =
+    existingReview.reviewStatusId || pendingStatus._id;
 
       await existingReview.save();
 
@@ -38,18 +58,18 @@ exports.createReview = async (req, res) => {
         data: existingReview
       });
     }
+const review = new Review({
+  patientId,
+  physioId,
+  sessionId,
+  reviewDate,
+  reviewTime,
+  reviewTypeId,
+  redFlags,
+  feedback,
+  reviewStatusId: pendingStatus._id, //  IMPORTANT LINE
+});
 
-    // ✅ CREATE ONLY IF NOT EXISTS
-    const review = new Review({
-      patientId,
-      physioId,
-      sessionId,
-      reviewDate,
-      reviewTime,
-      reviewTypeId,
-      redflagId,
-      feedback
-    });
 
     await review.save();
 
@@ -87,11 +107,12 @@ exports.createRedflag = async (req, res) => {
 // Get all Review
 exports.getAllReview = async (req, res) => {
   try {
-    const reviews = await Review.find()
-      .populate("patientId", "patientName")
-      .populate("physioId", "physioName")
-      .populate("reviewTypeId", "reviewTypeName")
-      // .populate("redflagId");
+   const reviews = await Review.find()
+  .populate("patientId", "patientName")
+  .populate("physioId", "physioName")
+  .populate("reviewTypeId", "reviewTypeName")
+  .populate("redFlags.redFlagId")
+  .populate("reviewStatusId","reviewStatusName")
 
     res.status(200).json(reviews);
   } catch (error) {
@@ -112,7 +133,8 @@ exports.getReviewById = async (req, res) => {
       .populate("patientId", "patientName")
       .populate("physioId", "physioName")
       .populate("reviewTypeId", "reviewTypeName")
-      .populate("redflagId");
+      .populate("redFlags.redFlagId")
+       .populate("reviewStatusId","reviewStatusName")
 
     if (!review) {
       return res.status(404).json({ message: "Review not found" });
@@ -134,10 +156,14 @@ exports.updateReview = async (req, res) => {
       reviewDate,
       reviewTime,
       reviewTypeId,
-      redflagId,
+      redFlags,
       feedback,
+      reviewStatusId,
     } = req.body;
     // const { _id, patientId, physioId, reviewDate, reviewTime } = req.body;
+ if (!mongoose.Types.ObjectId.isValid(_id)) {
+  return res.status(400).json({ message: "Invalid ID" });
+}
 
     const review = await Review.findByIdAndUpdate(
       _id,
@@ -147,8 +173,9 @@ exports.updateReview = async (req, res) => {
         reviewDate,
         reviewTime,
         reviewTypeId,
-        redflagId,
+        redFlags:redFlags || [],
         feedback,
+        reviewStatusId
       },
       // { patientId, physioId, reviewDate, reviewTime },
       { new: true, runValidators: true }
@@ -157,10 +184,7 @@ exports.updateReview = async (req, res) => {
     if (!review) {
       return res.status(404).json({ message: "Review not found" });
     }
-    if (!mongoose.Types.ObjectId.isValid(_id)) {
-  return res.status(400).json({ message: "Invalid ID" });
-}
-
+   
 
     res
       .status(200)
