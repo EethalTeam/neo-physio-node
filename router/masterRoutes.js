@@ -23,7 +23,7 @@ const RBACControllers = require('../controllers/mastercontrollers/RBACController
 const ReviewControllers = require('../controllers/mainControllers/ReviewControllers')
 const ReviewTypeControllers= require('../controllers/mainControllers/ReviewTypeControllers')
 const ReviewStatusControllers= require('../controllers/mastercontrollers/ReviewStatusController')   
-
+// const NotificationControllers=require('../controllers/mastercontrollers/NotificationControllers')
 
 
 //Machinery Category Routes
@@ -100,6 +100,16 @@ router.post('/ReviewType/getAllReviewType',ReviewTypeControllers.getAllReviewTyp
 router.post('/ReviewType/getReviewTypeById',ReviewTypeControllers.getReviewTypeById)
 router.post('/ReviewType/updateReviewType',ReviewTypeControllers.updateReviewType)
 router.post('/ReviewType/deleteReviewType',ReviewTypeControllers.deleteReviewType)
+
+
+//Notification
+
+// router.post("/Notifications/createNotifications", NotificationControllers.createNotification);
+// router.post("/Notifications/getNotifications", NotificationControllers.getNotificationsByEmployee);
+// router.post("/Notifications/updateNotificationStatus", NotificationControllers.updateNotificationStatus);
+// router.post("/Notifications/markAsSeen", NotificationControllers.markAsSeen);
+
+
 
 
 

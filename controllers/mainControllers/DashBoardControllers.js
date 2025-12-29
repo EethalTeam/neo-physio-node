@@ -14,13 +14,21 @@ exports.getAllDashBoard = async (req, res) => {
         let sessionCompleted = await Session.find({
             sessionToTime: { $ne: null }
         });
+let today = new Date();
+let startDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+let endDay = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+
+let todaysession = await Session.find({
+    sessionDate: { $gte: startDay, $lt: endDay }
+});
 
         let filter = {
             lead: lead.length,
             patient: patient.length,
             physio: physio.length,
             session: session.length,
-            sessionCompleted: sessionCompleted.length
+            sessionCompleted: sessionCompleted.length,
+            todaysession:todaysession.length
         }
 
         if (!filter) {
