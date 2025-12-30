@@ -6,6 +6,9 @@ const PetrolAllowance = require('../../model/masterModels/PetrolAllowance')
 const Review = require('../../model/masterModels/Review');
 const ReviewType = require('../../model/masterModels/ReviewType');
 const ReviewStatus =require('../../model/masterModels/ReviewStatus');
+const Employee = require('../../model/masterModels/Physio');
+const RoleBased = require('../../model/masterModels/RBAC');
+const Notification = require('../../model/masterModels/Notification');
 // Create a new Session
 exports.createSession = async (req, res) => {
     try {
@@ -327,15 +330,13 @@ exports.SessionEnd = async (req, res) => {
             sessionend.machineId = machineId;
         }
 
-        // 1. Validate Status
         const Status = await SessionStatus.findOne({ sessionStatusName: action });
         if (!Status) {
             return res.status(400).json({ message: "Session Status is not found" });
-        }else{
+        } else {
             sessionend.sessionStatusId = Status._id;
         }
          
-        // 2. Update Session
         const session = await Session.findByIdAndUpdate(
             _id,
             { $set: sessionend },
@@ -346,37 +347,71 @@ exports.SessionEnd = async (req, res) => {
             return res.status(400).json({ message: "Session End is not found" });
         }
 
-        // ---------------------------------------------------------
-        // 🔥 NEW LOGIC: GENERATE REVIEW IF REDFLAGS EXIST
-        // ---------------------------------------------------------
+        // 🔥 GENERATE REVIEW AND NOTIFY HOD IF REDFLAGS EXIST
         if (redFlags && redFlags.length > 0) {
-            // Mapping the simple IDs from req.body to the schema structure [{ redFlagId: ... }]
             const formattedRedFlags = redFlags.map(id => ({
                 redFlagId: new mongoose.Types.ObjectId(id.redFlagId)
             }));
-                const reviewTypeDefault = await ReviewType.findOne({ reviewTypeName: 'RedFlags' });
-                if (!reviewTypeDefault) {
-                    return res.status(500).json({ message: 'Default ReviewType not found. Please create one named "Standard".' });
+            
+            const reviewTypeDefault = await ReviewType.findOne({ reviewTypeName: 'RedFlags' });
+            const reviewStatusDefault = await ReviewStatus.findOne({ reviewStatusName: 'Pending' });
+
+            if (reviewTypeDefault && reviewStatusDefault) {
+                const newReview = await Review.create({
+                    patientId: session.patientId,
+                    physioId: session.physioId,
+                    reviewDate: session.sessionDate,
+                    sessionId: session._id,
+                    reviewTypeId: reviewTypeDefault._id,
+                    redFlags: formattedRedFlags,
+                    reviewStatusId: reviewStatusDefault._id,
+                });
+
+                // --- START NOTIFICATION LOGIC ---
+                try {
+                    const roleId = await RoleBased.findOne({ roleName: "HOD" });
+                    if (!roleId) {
+                        res.status(400).json({ message: "HOD role not found" });
+                    }   
+                    const hodEmployees = await Employee.find({ roleId: roleId._id }); // Ensure "role" field matches your Employee schema
+                    const io = req.app.get("socketio");
+                    
+                    if (hodEmployees.length > 0) {
+                        const notificationPromises = hodEmployees.map(async (hod) => {
+                            const notification = new Notification({
+                                fromEmployeeId: session.physioId, 
+                                toEmployeeId: hod._id,
+                                message: `Red Flag Alert! A session for patient ${patient?.patientName || 'N/A'} has been ended with red flags.`,
+                                type: "Red-Flag-Alert",
+                                status: "unseen",
+                                meta: {
+                                    SessionId: session._id,
+                                    PhysioId: session.physioId,
+                                    PatientId: session.patientId,
+                                    ReviewId: newReview._id
+                                }
+                            });
+
+                            await notification.save();
+
+                            if (io) {
+                                io.to(hod._id.toString()).emit("receiveNotification", notification);
+                            }
+                        });
+
+                        await Promise.all(notificationPromises);
+                    }
+                } catch (notifyErr) {
+                    console.error("HOD Notification failed:", notifyErr.message);
                 }
-                 const reviewStatusDefault = await ReviewStatus.findOne({ reviewStatusName: 'Pending' });
-                if (!reviewStatusDefault) {
-                    return res.status(500).json({ message: 'Default ReviewType not found. Please create one named "Standard".' });
-                }
-            await Review.create({
-                patientId: session.patientId,
-                physioId: session.physioId,
-                reviewDate: session.sessionDate,
-                sessionId: session._id,
-                reviewTypeId: reviewTypeDefault._id,
-                redFlags: formattedRedFlags,
-                reviewStatusId: reviewStatusDefault._id,
-            });
+                // --- END NOTIFICATION LOGIC ---
+            }
         }
-        // ---------------------------------------------------------
 
         // 3. PETROL ALLOWANCE LOGIC (Existing)
         const patient = await Patient.findById(session.patientId);
         if (patient) {
+            // ... (Your existing petrol logic remains untouched) ...
             let kmsToAdd = 0;
             if (patient.visitOrder === 1) {
                 kmsToAdd = patient.KmsfromHub || 0;

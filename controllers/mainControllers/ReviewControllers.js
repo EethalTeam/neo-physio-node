@@ -2,6 +2,10 @@ const mongoose = require("mongoose");
 const Review = require("../../model/masterModels/Review");
 const RedFlag = require("../../model/masterModels/Redflag");
 const ReviewStatus = require("../../model/masterModels/ReviewStatus");
+const Employee = require('../../model/masterModels/Physio');
+const RoleBased = require('../../model/masterModels/RBAC');
+const Notification = require('../../model/masterModels/Notification');
+const Patient = require('../../model/masterModels/Patient');
 
 exports.createReview = async (req, res) => {
   try {
@@ -160,10 +164,10 @@ exports.updateReview = async (req, res) => {
       feedback,
       reviewStatusId,
     } = req.body;
-    // const { _id, patientId, physioId, reviewDate, reviewTime } = req.body;
- if (!mongoose.Types.ObjectId.isValid(_id)) {
-  return res.status(400).json({ message: "Invalid ID" });
-}
+
+    if (!mongoose.Types.ObjectId.isValid(_id)) {
+      return res.status(400).json({ message: "Invalid ID" });
+    }
 
     const review = await Review.findByIdAndUpdate(
       _id,
@@ -173,22 +177,74 @@ exports.updateReview = async (req, res) => {
         reviewDate,
         reviewTime,
         reviewTypeId,
-        redFlags:redFlags || [],
+        redFlags: redFlags || [],
         feedback,
-        reviewStatusId
+        reviewStatusId,
       },
-      // { patientId, physioId, reviewDate, reviewTime },
       { new: true, runValidators: true }
     );
 
     if (!review) {
       return res.status(404).json({ message: "Review not found" });
     }
-   
 
-    res
-      .status(200)
-      .json({ message: "Review updated successfully", data: review });
+    // --- START NOTIFICATION LOGIC ---
+    try {
+      // 1. Check if the status is "Completed"
+      const completedStatus = await ReviewStatus.findOne({ reviewStatusName: 'Completed' });
+      
+      if (completedStatus && reviewStatusId.toString() === completedStatus._id.toString()) {
+        
+        // 2. Find SuperAdmins and Admins
+        const adminRoleId = await RoleBased.findOne({ roleName: "Admin" });
+        if (!adminRoleId) {
+          res.status(400).json({ message: "Admin role not found" });
+        }
+        const superAdminRoleId = await RoleBased.findOne({ roleName: "SuperAdmin" });
+        if (!superAdminRoleId) {
+          res.status(400).json({ message: "SuperAdmin role not found" });
+        }
+        
+        const admins = await Employee.find({ 
+          roleId: { $in: [superAdminRoleId._id, adminRoleId._id] } 
+        });
+        const patient = await Patient.findById(patientId);
+        const patientName = patient ? patient.patientName : "the patient";
+        if (admins.length > 0) {
+          const io = req.app.get("socketio");
+
+          const notificationPromises = admins.map(async (admin) => {
+            const newNotification = new Notification({
+              fromEmployeeId: physioId,
+              toEmployeeId: admin._id,
+             message: `Review completed for ${patientName}. Feedback: ${feedback || 'No feedback provided.'}`,
+              type: "Review-Completed",
+              status: "unseen",
+              meta: {
+                ReviewId: review._id,
+                PatientId: patientId,
+                PhysioId: physioId
+              }
+            });
+
+            await newNotification.save();
+
+            // 3. Emit via Socket.io
+            if (io) {
+              io.to(admin._id.toString()).emit("receiveNotification", newNotification);
+            }
+          });
+
+          await Promise.all(notificationPromises);
+        }
+      }
+    } catch (notifyErr) {
+      console.error("Admin Notification failed:", notifyErr.message);
+      // Fail silently to ensure the response is still sent to the user
+    }
+    // --- END NOTIFICATION LOGIC ---
+
+    res.status(200).json({ message: "Review updated successfully", data: review });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

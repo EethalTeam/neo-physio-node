@@ -1,4 +1,4 @@
- const mongoose = require('mongoose');
+const mongoose = require('mongoose');
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
@@ -8,13 +8,14 @@ const { Server } = require('socket.io');
 const masterRoutes = require('./router/masterRoutes');
 const mainRoutes = require('./router/mainRoutes');
 // const authRoutes = require('./routes/authRoutes');
-// const Notification = require('./models/masterModels/Notifications');
+
+// --- UNCOMMENTED FOR NOTIFICATIONS ---
+const Notification = require('./models/masterModels/Notifications');
 // const Group = require('./models/masterModels/Group');
 // const Message = require('./models/masterModels/Message');
-// const { logoutUser } = require('./controllers/masterControllers/EmployeeControllers');
-// const { autoCheckoutOnDisconnect } = require('./controllers/masterControllers/AttendanceControllers');
-// const { checkLogin } = require('./controllers/masterControllers/EmployeeControllers');
-// const webhookRoutes = require("./routes/webHookRoutes");
+
+// const logoutUser = require('./controllers/masterControllers/EmployeeControllers');
+// const autoCheckoutOnDisconnect = require('./controllers/masterControllers/AttendanceControllers');
 
 const app = express();
 const PORT = 8001;
@@ -40,8 +41,7 @@ app.get('/privacy', (req, res) => {
     <p>If you wish to opt-out or request data deletion, please contact eethalnaditsolutions@gmail.com.</p>
   `);
 });
-// app.use("/webhook", webhookRoutes);
-// app.use('/api', authRoutes);
+
 app.use('/api', masterRoutes);
 app.use('/api', mainRoutes);
 
@@ -65,186 +65,91 @@ const io = new Server(server, {
 
 // app.set("socketio", io);
 
-// const heartbeatTimers = new Map();       // employeeId -> timeout
-// const employeeSockets = new Map();       // employeeId -> Set of socketIds
+const employeeSockets = new Map(); // employeeId -> Set of socketIds
 
-// io.on("connection", (socket) => {
-//   console.log("⚡ A client connected:", socket.id);
+
+
+io.on("connection", (socket) => {
+  console.log("⚡ A client connected:", socket.id);
 
   // ================== Join Room for Personal Notifications ==================
-//   socket.on("joinRoom", ({ employeeId }) => {
-//     socket.employeeId = employeeId;
-//     socket.join(employeeId);
+  socket.on("joinRoom", ({ employeeId }) => {
+    socket.employeeId = employeeId;
+    socket.join(employeeId);
 
-//     if (!employeeSockets.has(employeeId)) {
-//       employeeSockets.set(employeeId, new Set());
-//     }
-//     employeeSockets.get(employeeId).add(socket.id);
+    if (!employeeSockets.has(employeeId)) {
+      employeeSockets.set(employeeId, new Set());
+    }
+    employeeSockets.get(employeeId).add(socket.id);
 
-//     console.log(`Socket ${socket.id} joined personal room: ${employeeId}`);
-//   });
+    console.log(`Socket ${socket.id} joined personal room: ${employeeId}`);
+  });
   
-  // ================== NEW: GROUP CHAT EVENTS ==================
-  // 1. Event for a user to join a specific group chat room
-//   socket.on("join_group_chat", (groupId) => {
-//     socket.join(groupId);
-//     console.log(`Socket ${socket.id} joined group chat room: ${groupId}`);
-//   });
+  // ================== Send Message (Notification) ==================
+  socket.on("sendMessage", async ({ type, message, toEmployeeId = null, groupId = null, meta = {} }) => {
+    try {
+      const notification = await createNotification({
+        type,
+        message,
+        fromEmployeeId: socket.employeeId,
+        toEmployeeId,
+        groupId,
+        meta,
+      });
 
-  // 2. Event for a user to leave a group chat room
-//   socket.on("leave_group_chat", (groupId) => {
-//     socket.leave(groupId);
-//     console.log(`Socket ${socket.id} left group chat room: ${groupId}`);
-//   });
-
-  // 3. Event for sending a message specifically to a group
-//   socket.on("send_group_message", async (messageData) => {
-//     if (!messageData.groupId || !messageData.senderId || !messageData.content) {
-//       console.error("❌ Invalid group message data received");
-//       return;
-//     }
-//     // Use the dedicated handler for chat messages
-//     await handleGroupChatMessage(socket, messageData);
-//   });
-  // // ================== Heartbeat ==================
-  // socket.on("heartbeat", ({ employeeId }) => {
-  //   if (!employeeId) return;
-  //   console.log(`❤️ Heartbeat from ${employeeId}`);
-
-  //   // Clear old timer
-  //   if (heartbeatTimers.has(employeeId)) clearTimeout(heartbeatTimers.get(employeeId));
-
-  //   // Start new timer (2 min grace period)
-  //   const timer = setTimeout(async () => {
-  //     const sockets = employeeSockets.get(employeeId) || new Set();
-  //     if (sockets.size === 0) { // only logout if no active sockets
-  //       console.log(`⚠️ No heartbeat from ${employeeId}, logging out`);
-  //       await performLogout(employeeId);
-  //       heartbeatTimers.delete(employeeId);
-  //     }
-  //   }, 120000); // 2 minutes
-
-  //   heartbeatTimers.set(employeeId, timer);
-  // });
-
-  // // ================== Tab Closing ==================
-  // socket.on("tabClosing", async ({ employeeId }) => {
-  //   console.log("🚪 Tab closed, logging out:", employeeId);
-  //   await performLogout(employeeId);
-
-  //   if (heartbeatTimers.has(employeeId)) {
-  //     clearTimeout(heartbeatTimers.get(employeeId));
-  //     heartbeatTimers.delete(employeeId);
-  //   }
-
-  //   if (employeeSockets.has(employeeId)) {
-  //     employeeSockets.get(employeeId).delete(socket.id);
-  //     if (employeeSockets.get(employeeId).size === 0) {
-  //       employeeSockets.delete(employeeId);
-  //     }
-  //   }
-  // });
-
-  // ================== Send Message ==================
-//   socket.on("sendMessage", async ({ type, message, toEmployeeId = null, groupId = null, meta = {} }) => {
-//     try {
-//       const notification = await createNotification({
-//         type,
-//         message,
-//         fromEmployeeId: socket.employeeId,
-//         toEmployeeId,
-//         groupId,
-//         meta,
-//       });
-
-//       console.log("✅ Notification created:", notification._id);
-//     } catch (err) {
-//       console.error("❌ Error sending notification:", err.message);
-//     }
-//   });
+      console.log("✅ Notification created:", notification._id);
+    } catch (err) {
+      console.error("❌ Error sending notification:", err.message);
+    }
+  });
 
   // ================== Disconnect ==================
-//   socket.on("disconnect", () => {
-//     const { employeeId } = socket;
-//     if (employeeId && employeeSockets.has(employeeId)) {
-//       const sockets = employeeSockets.get(employeeId);
-//       sockets.delete(socket.id);
-//       if (sockets.size === 0) {
-//         employeeSockets.delete(employeeId);
-//         // Timer will handle logout if heartbeat not received
-//       }
-//     }
-//     console.log(`❌ Socket disconnected: ${socket.id}`);
-//   });
-// });
-
-
-// async function performLogout(employeeId) {
-//   try {
-//     await logoutUser(employeeId);
-//     await autoCheckoutOnDisconnect(employeeId);
-//     console.log(`✅ Successfully logged out employee: ${employeeId}`);
-//   } catch (error) {
-//     console.error(`❌ Error during logout for employee ${employeeId}:`, error.message);
-//   }
-// }
+  socket.on("disconnect", () => {
+    const { employeeId } = socket;
+    if (employeeId && employeeSockets.has(employeeId)) {
+      const sockets = employeeSockets.get(employeeId);
+      sockets.delete(socket.id);
+      if (sockets.size === 0) {
+        employeeSockets.delete(employeeId);
+      }
+    }
+    console.log(`❌ Socket disconnected: ${socket.id}`);
+  });
+});
 
 // ---------------- HELPER: CREATE NOTIFICATION ----------------
-// const createNotification = async ({ type, message, fromEmployeeId, toEmployeeId = null, groupId = null, meta = {} }) => {
-//   try {
-//     const notificationData = {
-//       type,
-//       message,
-//       fromEmployeeId,
-//       toEmployeeId,
-//       groupId,
-//       meta,
-//     };
+const createNotification = async ({ type, message, fromEmployeeId, toEmployeeId = null, groupId = null, meta = {} }) => {
+  try {
+    const notificationData = {
+      type,
+      message,
+      fromEmployeeId,
+      toEmployeeId,
+      groupId,
+      meta,
+    };
 
-//     if (["leave-request", "permission-request", "chat-message", "group-chat-message"].includes(type)) {
-//       notificationData.status = "unseen";
-//     } else {
-//       notificationData.status = "seen";
-//     }
+    // Specific logic for notification status
+    if (["leave-request", "permission-request"].includes(type)) {
+      notificationData.status = "unseen";
+    } else {
+      notificationData.status = "seen";
+    }
 
-//     const notification = await Notification.create(notificationData);
+    const notification = await Notification.create(notificationData);
 
-//     // Emit via socket if online
-//     if (toEmployeeId) {
-//       io.to(toEmployeeId.toString()).emit("receiveNotification", notification);
-//     } else if (groupId) {
-//       const group = await Group.findById(groupId).populate("members", "_id");
-//       group.members.forEach(member => {
-//         if (member._id.toString() !== fromEmployeeId.toString()) {
-//           io.to(member._id.toString()).emit("receiveNotification", notification);
-//         }
-//       });
-//     }
+    // Emit via socket if online
+    if (toEmployeeId) {
+      io.to(toEmployeeId.toString()).emit("receiveNotification", notification);
+    } 
+    // Group chat emission remains commented out/skipped as requested
 
-//     return notification;
-//   } catch (err) {
-//     console.error("❌ Error creating notification:", err.message);
-//     throw err;
-//   }
-// };
-
-// ---------------- NEW HELPER: HANDLE GROUP CHAT MESSAGE ----------------
-// const handleGroupChatMessage = async (socket, { groupId, senderId, content }) => {
-//   try {
-//     const newMessage = await Message.create({ groupId, senderId, content });
-//     const populatedMessage = await newMessage.populate('senderId', 'name avatar');
-//     await Group.findByIdAndUpdate(groupId, { lastMessage: newMessage._id });
-
-//     // FIX: Use socket.broadcast.to()
-//     // This sends the message to everyone in the room EXCEPT the socket that sent it.
-//     socket.broadcast.to(groupId).emit('receive_group_message', populatedMessage);
-    
-//     console.log(`✅ Message broadcast to group ${groupId}`);
-
-//   } catch (err) {
-//     console.error("❌ Error handling group chat message:", err.message);
-//   }
-// };
+    return notification;
+  } catch (err) {
+    console.error("❌ Error creating notification:", err.message);
+    throw err;
+  }
+};
 
 // ---------------- MONGODB CONNECTION ----------------
 async function main() {
