@@ -346,6 +346,7 @@ exports.SessionEnd = async (req, res) => {
         if (!session) {
             return res.status(400).json({ message: "Session End is not found" });
         }
+        const patient = await Patient.findById(session.patientId);
 
         // 🔥 GENERATE REVIEW AND NOTIFY HOD IF REDFLAGS EXIST
         if (redFlags && redFlags.length > 0) {
@@ -362,9 +363,9 @@ exports.SessionEnd = async (req, res) => {
                     physioId: session.physioId,
                     reviewDate: session.sessionDate,
                     sessionId: session._id,
-                    reviewTypeId: reviewTypeDefault._id,
+                    reviewTypeId:  new mongoose.Types.ObjectId(reviewTypeDefault._id),
                     redFlags: formattedRedFlags,
-                    reviewStatusId: reviewStatusDefault._id,
+                    reviewStatusId: new mongoose.Types.ObjectId(reviewStatusDefault._id),
                 });
 
                 // --- START NOTIFICATION LOGIC ---
@@ -409,7 +410,6 @@ exports.SessionEnd = async (req, res) => {
         }
 
         // 3. PETROL ALLOWANCE LOGIC (Existing)
-        const patient = await Patient.findById(session.patientId);
         if (patient) {
             // ... (Your existing petrol logic remains untouched) ...
             let kmsToAdd = 0;

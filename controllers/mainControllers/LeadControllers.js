@@ -246,6 +246,7 @@ exports.QualifyLead = async (req, res) => {
             // --- NOTIFICATION LOGIC ---
             try {
                 const roleId = await RoleBased.findOne({ RoleName: "HOD" });
+                console.log(roleId,"roleId")
                 if (roleId) {
                     const hodEmployees = await Employee.find({ roleId: roleId._id });
                     if (hodEmployees.length > 0) {
@@ -264,6 +265,7 @@ exports.QualifyLead = async (req, res) => {
                                 }
                             });
                             await newNotification.save();
+                            console.log(newNotification,"newNotification")
                             if (io) {
                                 io.to(hod._id.toString()).emit("receiveNotification", newNotification);
                             }

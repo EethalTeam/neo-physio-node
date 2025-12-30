@@ -7,6 +7,7 @@ const Lead = require('../../model/masterModels/Leads');
 const Leadstatus = require('../../model/masterModels/Leadstatus')
 const Review = require('../../model/masterModels/Review');
 const ReviewType = require('../../model/masterModels/ReviewType');
+const ReviewStatus = require('../../model/masterModels/ReviewStatus')
 // Create a new Patient
 exports.createConsultation = async (req, res) => {
     try {
@@ -248,6 +249,11 @@ exports.AssignPhysio = async (req, res) => {
         if (!reviewTypeDefault) {
             return res.status(500).json({ message: 'Default ReviewType not found. Please create one named "Standard".' });
         }
+        
+                    const reviewStatusDefault = await ReviewStatus.findOne({ reviewStatusName: 'Pending' });
+                      if (!reviewStatusDefault) {
+            return res.status(500).json({ message: 'Default Reviewstatus not found. Please create one named "Standard".' });
+        }
         let sessionsGenerated = 0;
         const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -279,6 +285,7 @@ exports.AssignPhysio = async (req, res) => {
                 reviewsToCreate.push({
                     patientId: newPatient._id,
                     physioId: physioId,
+                     reviewStatusId:  new mongoose.Types.ObjectId(reviewStatusDefault._id),
                     reviewDate: currentSessionDate,
                     reviewTypeId: new mongoose.Types.ObjectId(reviewTypeDefault._id)
                 });

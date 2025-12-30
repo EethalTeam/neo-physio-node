@@ -35,7 +35,6 @@ exports.createLeadStatus = async (req, res) => {
 exports.getAllLeadStatus = async (req, res) => {
     try {
         const leadStatus = await LeadStatus.find()
-        res.status(200).json(leadStatus)
         if(!leadStatus){
             return res.status(400).json({message:"LeadStatus is not find"})
         }  
