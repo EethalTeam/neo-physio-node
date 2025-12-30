@@ -243,73 +243,67 @@ exports.QualifyLead = async (req, res) => {
         await consult.save();
 
         if (consult) {
+            // --- NOTIFICATION LOGIC ---
             try {
-                // 1. Find all employees with role HOD
                 const roleId = await RoleBased.findOne({ roleName: "HOD" });
-                if (!roleId) {
-                    throw new Error("HOD role not found");
-                }
-                const hodEmployees = await Employee.find({ roleId: roleId._id }); // Ensure "role" field matches your Employee schema
-
-                if (hodEmployees.length > 0) {
-                    const io = req.app.get("socketio");
-
-                    // 2. Create and Send notifications
-                    const notificationPromises = hodEmployees.map(async (hod) => {
-                        const newNotification = new Notification({
-                            fromEmployeeId: fromEmployeeId,
-                            toEmployeeId: hod._id,
-                            message: `New Consultation created for ${leadName}. Scheduled Date: ${new Date(ConsultationDate).toLocaleDateString()}`,
-                            type: "Consultation-Reminder",
-                            status: "unseen",
-                            meta: {
-                                ConsultationId: consult._id,
-                                PatientId: null, // If you create a Patient record later, link it here
-                                LeadId: _id
+                if (roleId) {
+                    const hodEmployees = await Employee.find({ roleId: roleId._id });
+                    if (hodEmployees.length > 0) {
+                        const io = req.app.get("socketio");
+                        const notificationPromises = hodEmployees.map(async (hod) => {
+                            const newNotification = new Notification({
+                                fromEmployeeId: fromEmployeeId,
+                                toEmployeeId: hod._id,
+                                message: `New Consultation created for ${leadName}. Scheduled Date: ${new Date(ConsultationDate).toLocaleDateString()}`,
+                                type: "Consultation-Reminder",
+                                status: "unseen",
+                                meta: {
+                                    ConsultationId: consult._id,
+                                    PatientId: null,
+                                    LeadId: _id
+                                }
+                            });
+                            await newNotification.save();
+                            if (io) {
+                                io.to(hod._id.toString()).emit("receiveNotification", newNotification);
                             }
                         });
-
-                        await newNotification.save();
-
-                        // 3. Real-time emit
-                        if (io) {
-                            io.to(hod._id.toString()).emit("receiveNotification", newNotification);
-                        }
-                    });
-
-                    await Promise.all(notificationPromises);
+                        await Promise.all(notificationPromises);
+                    }
                 }
             } catch (notifyError) {
                 console.error("Notification Error:", notifyError.message);
-                // We don't return res here because the Consultation was already successful
             }
-            // --- END NOTIFICATION LOGIC ---
 
+            // --- LEAD STATUS UPDATE ---
             const Leadstatus = await LeadStatus.findOne({ leadStatusName: 'Qualified' });
             if (Leadstatus) {
                 const lead = await Lead.findByIdAndUpdate(
                     _id,
-                    {
-                        $set: { LeadStatusId: new mongoose.Types.ObjectId(Leadstatus._id) }
-                    },
+                    { $set: { LeadStatusId: new mongoose.Types.ObjectId(Leadstatus._id) } },
                     { new: true, runValidators: true }
                 );
                 if (!lead) {
                     return res.status(404).json({ message: 'Lead not able to update' });
                 }
             } else {
-                return res.status(500).json({ message: 'Lead status not found' });
+                // 🔥 Added RETURN here to stop execution
+                return res.status(500).json({ message: 'Lead status "Qualified" not found' });
             }
 
-            res.status(200).json({
+            // Final success response
+            return res.status(200).json({
                 message: 'Lead qualified and Patient created successfully',
                 data: consult._id
             });
+
         } else {
-            res.status(500).json({ message: 'Lead qualify failed' });
+            // 🔥 Added RETURN here
+            return res.status(500).json({ message: 'Lead qualify failed' });
         }
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        // 🔥 Added RETURN here
+        return res.status(500).json({ message: err.message });
     }
 };
 
