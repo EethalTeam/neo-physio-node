@@ -369,7 +369,7 @@ exports.SessionEnd = async (req, res) => {
 
                 // --- START NOTIFICATION LOGIC ---
                 try {
-                    const roleId = await RoleBased.findOne({ roleName: "HOD" });
+                    const roleId = await RoleBased.findOne({ RoleName: "HOD" });
                     if (!roleId) {
                         res.status(400).json({ message: "HOD role not found" });
                     }   
