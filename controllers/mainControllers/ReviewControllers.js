@@ -196,11 +196,11 @@ exports.updateReview = async (req, res) => {
       if (completedStatus && reviewStatusId.toString() === completedStatus._id.toString()) {
         
         // 2. Find SuperAdmins and Admins
-        const adminRoleId = await RoleBased.findOne({ roleName: "Admin" });
+        const adminRoleId = await RoleBased.findOne({ RoleName: "Admin" });
         if (!adminRoleId) {
           res.status(400).json({ message: "Admin role not found" });
         }
-        const superAdminRoleId = await RoleBased.findOne({ roleName: "SuperAdmin" });
+        const superAdminRoleId = await RoleBased.findOne({ RoleName: "SuperAdmin" });
         if (!superAdminRoleId) {
           res.status(400).json({ message: "SuperAdmin role not found" });
         }

@@ -245,7 +245,7 @@ exports.QualifyLead = async (req, res) => {
         if (consult) {
             // --- NOTIFICATION LOGIC ---
             try {
-                const roleId = await RoleBased.findOne({ roleName: "HOD" });
+                const roleId = await RoleBased.findOne({ RoleName: "HOD" });
                 if (roleId) {
                     const hodEmployees = await Employee.find({ roleId: roleId._id });
                     if (hodEmployees.length > 0) {
