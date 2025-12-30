@@ -6,18 +6,17 @@ const notificationSchema = new mongoose.Schema(
     fromEmployeeId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Employee",
-      required: true,
     },
     toEmployeeId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Employee",
       // For group messages, this can be null
     },
-    groupId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Group",
-      default: null,
-    },
+    // groupId: {
+    //   type: mongoose.Schema.Types.ObjectId,
+    //   ref: "Group",
+    //   default: null,
+    // },
     message: {
       type: String,
       required: true,
@@ -26,16 +25,18 @@ const notificationSchema = new mongoose.Schema(
     type: {
       type: String,
       enum: [
-        "leave-request",
-        "permission-request",
-        "general",
-        "chat-message",
+        "Consultation-Reminder",
+        "Review-Reminder",
+        "Red-Flag-Alert",
+        "Chat-Message",
         "group-chat-message",
         "announcement",
-        "task-assignment",
-        "task-complete",
-        "holiday-notice",
-        "system-alert",
+        "Session-Update",
+        "Session-Cancellation",
+        "Session-Extended",
+        "Pending-Review",
+        "Review-Completed",
+        "general",
         "other"
       ],
       default: "general",
@@ -46,9 +47,12 @@ const notificationSchema = new mongoose.Schema(
       default: "unseen",
     },
     meta: {
-      leaveRequestId: { type: mongoose.Schema.Types.ObjectId, ref: "Leave" },
-      permissionRequestId: { type: mongoose.Schema.Types.ObjectId, ref: "Permission" },
-      taskId: { type: mongoose.Schema.Types.ObjectId, ref: "Task" },
+      SessionId: { type: mongoose.Schema.Types.ObjectId, ref: "Session" },
+      PhysioId: { type: mongoose.Schema.Types.ObjectId, ref: "Physio" },
+      PatientId: { type: mongoose.Schema.Types.ObjectId, ref: "Patient" },
+      ReviewId: { type: mongoose.Schema.Types.ObjectId, ref: "Review"  },
+      ConsultationId: { type: mongoose.Schema.Types.ObjectId, ref: "Consultation"  },
+      LeadId: { type: mongoose.Schema.Types.ObjectId, ref: "Lead"  },
     },
   },
   { timestamps: true }
