@@ -10,7 +10,7 @@ const mainRoutes = require('./router/mainRoutes');
 // const authRoutes = require('./routes/authRoutes');
 
 // --- UNCOMMENTED FOR NOTIFICATIONS ---
-const Notification = require('./models/masterModels/Notifications');
+const Notification = require('./model/masterModels/Notification');
 // const Group = require('./models/masterModels/Group');
 // const Message = require('./models/masterModels/Message');
 
