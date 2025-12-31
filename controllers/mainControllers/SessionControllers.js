@@ -240,68 +240,128 @@ exports.SessionStart = async (req,res) => {
     }
 }
 
-//Session Canceled
-exports.SessionCancel = async (req,res)=>{
+exports.SessionCancel = async (req, res) => {
     try {
-        const {_id,action,cancelledKms} = req.body
-         const Status = await SessionStatus.findOne({sessionStatusName:action})
-        if(!Status){
-             res.status(400).json({message:"Session Status is not found"})
-        }
-        const session = await Session.findByIdAndUpdate(_id,{
-            $set:
-            {sessionStatusId:Status._id}
-        },{new:true,runValidators:true})
-        if(!session){
-             res.status(400).json({message:"Session not Cancel"})
+        const { _id, action, cancelledKms } = req.body;
+
+        const Status = await SessionStatus.findOne({ sessionStatusName: action });
+        if (!Status) {
+            return res.status(400).json({ message: "Session Status is not found" });
         }
 
-            res.status(200).json(session)
-    
-         const patient = await Patient.findById(session.patientId);
-             if (patient) {
-            let kmsToAdd = 0;
+        const cancelledSession = await Session.findByIdAndUpdate(_id, {
+            $set: { sessionStatusId: Status._id }
+        }, { new: true, runValidators: true });
 
-            // Logic based on Visit Order
-         
-  if (patient.KmsfLPatienttoHub && patient.KmsfLPatienttoHub > 0) {
-                kmsToAdd += patient.KmsfLPatienttoHub;
+        if (!cancelledSession) {
+            return res.status(400).json({ message: "Session not found" });
+        }
+
+        // --- RESCHEDULING LOGIC (AS PREVIOUSLY IMPLEMENTED) ---
+        const lastSession = await Session.findOne({ patientId: cancelledSession.patientId })
+            .sort({ sessionDate: -1 });
+
+        if (lastSession) {
+            let nextDate = new Date(lastSession.sessionDate);
+            let foundNextDate = false;
+            while (!foundNextDate) {
+                nextDate.setDate(nextDate.getDate() + 1);
+                if (nextDate.getDay() !== 0) foundNextDate = true;
             }
-             const allowanceDate = new Date(session.sessionDate);
+
+            const counter = await Counter.findByIdAndUpdate(
+                { _id: 'sessionCode' },
+                { $inc: { seq: 1 } },
+                { new: true, upsert: true }
+            );
+
+            const formattedCode = `SESS-${String(counter.seq).padStart(6, '0')}`;
+            const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+            await Session.create({
+                patientId: cancelledSession.patientId,
+                physioId: cancelledSession.physioId,
+                sessionDate: nextDate,
+                sessionTime: cancelledSession.sessionTime,
+                sessionStatusId: new mongoose.Types.ObjectId('691ecb36b87c5c57dead47a7'), 
+                sessionDay: daysOfWeek[nextDate.getDay()],
+                sessionCode: formattedCode
+            });
+        }
+
+        try {
+            const patient = await Patient.findById(cancelledSession.patientId);
+            
+            const roles = await RoleBased.find({ 
+                roleName: { $in: ["Admin", "SuperAdmin", "HOD"] } 
+            });
+            const roleIds = roles.map(r => r._id);
+
+            const staffToNotify = await Employee.find({ 
+                roleId: { $in: roleIds } 
+            });
+
+            const recipientIds = new Set(staffToNotify.map(emp => emp._id.toString()));
+            if (cancelledSession.physioId) {
+                recipientIds.add(cancelledSession.physioId.toString());
+            }
+
+            const io = req.app.get("socketio");
+
+            const notificationPromises = Array.from(recipientIds).map(async (empId) => {
+                const notification = new Notification({
+                    fromEmployeeId: cancelledSession.physioId, 
+                    toEmployeeId: empId,
+                    message: `Session ${cancelledSession.sessionCode} for ${patient?.patientName || 'Patient'} has been cancelled. A replacement session has been scheduled.`,
+                    type: "general",
+                    status: "unseen",
+                    meta: {
+                        SessionId: cancelledSession._id,
+                        PatientId: cancelledSession.patientId
+                    }
+                });
+
+                await notification.save();
+
+                if (io) {
+                    io.to(empId).emit("receiveNotification", notification);
+                }
+            });
+
+            await Promise.all(notificationPromises);
+        } catch (notifyErr) {
+            console.error("Cancellation Notification Error:", notifyErr.message);
+        }
+
+        res.status(200).json({
+            message: "Session cancelled, rescheduled, and notifications sent.",
+            cancelledSession
+        });
+
+        const patientData = await Patient.findById(cancelledSession.patientId);
+        if (patientData) {
+            let kmsToAdd = patientData.KmsfLPatienttoHub || 0;
+            const allowanceDate = new Date(cancelledSession.sessionDate);
             allowanceDate.setHours(12, 0, 0, 0);
 
-            // C. Update the PetrolAllowance Table
-            // We assume "Completed" sessions go to completedKms. 
-            // If you have a specific status for "Canceled upon arrival", you can add logic to update 'canceledKms' instead.
             await PetrolAllowance.findOneAndUpdate(
-                { 
-                    physioId: session.physioId, 
-                    date: allowanceDate 
-                },
+                { physioId: cancelledSession.physioId, date: allowanceDate },
                 { 
                     $inc: { 
                         completedKms: kmsToAdd,
-                        canceledKms: cancelledKms, 
+                        canceledKms: cancelledKms || 0, 
                         finalDailyKms: kmsToAdd 
                     } 
                 },
-                { 
-                    new: true, 
-                    upsert: true // Create the record if it doesn't exist yet
-                }
+                { new: true, upsert: true }
             );
         }
-
-
-      
-
     } catch (error) {
-         res.status(500).json({ message: error.message });
+        if (!res.headersSent) {
+            res.status(500).json({ message: error.message });
+        }
     }
-}
-
-
-//Session End Controllers
+};
 
 exports.SessionEnd = async (req, res) => {
     try {
