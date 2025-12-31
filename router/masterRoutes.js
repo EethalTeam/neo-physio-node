@@ -24,6 +24,7 @@ const ReviewControllers = require('../controllers/mainControllers/ReviewControll
 const ReviewTypeControllers= require('../controllers/mainControllers/ReviewTypeControllers')
 const ReviewStatusControllers= require('../controllers/mastercontrollers/ReviewStatusController')   
 // const NotificationControllers=require('../controllers/mastercontrollers/NotificationControllers')
+const NotificationController= require('../controllers/mastercontrollers/NotificationControllers')
 
 
 //Machinery Category Routes
@@ -104,10 +105,10 @@ router.post('/ReviewType/deleteReviewType',ReviewTypeControllers.deleteReviewTyp
 
 //Notification
 
-// router.post("/Notifications/createNotifications", NotificationControllers.createNotification);
-// router.post("/Notifications/getNotifications", NotificationControllers.getNotificationsByEmployee);
-// router.post("/Notifications/updateNotificationStatus", NotificationControllers.updateNotificationStatus);
-// router.post("/Notifications/markAsSeen", NotificationControllers.markAsSeen);
+router.post("/Notifications/createNotifications", NotificationController.createNotification);
+router.post("/Notifications/getNotifications", NotificationController.getNotificationsByEmployee);
+router.post("/Notifications/updateNotificationStatus", NotificationController.updateNotificationStatus);
+router.post("/Notifications/markAsSeen", NotificationController.markAsSeen);
 
 
 
