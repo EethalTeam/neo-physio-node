@@ -8,6 +8,7 @@ const ReviewType = require('../../model/masterModels/ReviewType');
 const ReviewStatus =require('../../model/masterModels/ReviewStatus');
 const Employee = require('../../model/masterModels/Physio');
 const RoleBased = require('../../model/masterModels/RBAC');
+const Counter = require('../../model/masterModels/Counter')
 const Notification = require('../../model/masterModels/Notification');
 // Create a new Session
 exports.createSession = async (req, res) => {
