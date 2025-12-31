@@ -348,7 +348,7 @@ exports.SessionEnd = async (req, res) => {
         }
         const patient = await Patient.findById(session.patientId);
 
-        // 🔥 GENERATE REVIEW AND NOTIFY HOD IF REDFLAGS EXIST
+        // GENERATE REVIEW AND NOTIFY HOD IF REDFLAGS EXIST
         if (redFlags && redFlags.length > 0) {
             const formattedRedFlags = redFlags.map(id => ({
                 redFlagId: new mongoose.Types.ObjectId(id.redFlagId)

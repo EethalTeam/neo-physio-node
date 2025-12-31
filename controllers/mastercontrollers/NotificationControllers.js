@@ -9,7 +9,7 @@ const mongoose = require('mongoose');
 // Create a notification
 exports.createNotification = async (req, res) => {
   try {
-    const { unitId, message, type, fromEmployeeId, toEmployeeId, groupId, meta } = req.body;
+    const { unitId, message, type, fromEmployeeId, toEmployeeId, meta } = req.body;
 
     if (!unitId || !message || !type || !fromEmployeeId) {
       return res.status(400).json({
@@ -154,31 +154,31 @@ exports.updateNotificationStatus = async (req, res) => {
     }
 
     //  If notification is for Leave Request
-    if (notification.type === "leave-request" && notification.meta?.leaveRequestId) {
-      await LeaveRequest.findByIdAndUpdate(
-        notification.meta.leaveRequestId,
-        { RequestStatusId: STATUS[newStatus] },
-        { new: true }
-      );
-    }
+    // if (notification.type === "leave-request" && notification.meta?.leaveRequestId) {
+    //   await LeaveRequest.findByIdAndUpdate(
+    //     notification.meta.leaveRequestId,
+    //     { RequestStatusId: STATUS[newStatus] },
+    //     { new: true }
+    //   );
+    // }
 
     // If notification is for Permission Request
-    if (notification.type === "permission-request" && notification.meta?.permissionRequestId) {
-      await PermissionRequest.findByIdAndUpdate(
-        notification.meta.permissionRequestId,
-        { RequestStatusId: STATUS[newStatus] },
-        { new: true }
-      );
-    }
+    // if (notification.type === "permission-request" && notification.meta?.permissionRequestId) {
+    //   await PermissionRequest.findByIdAndUpdate(
+    //     notification.meta.permissionRequestId,
+    //     { RequestStatusId: STATUS[newStatus] },
+    //     { new: true }
+    //   );
+    // }
 
         // If notification is for Permission Request
-    if (notification.type === "task-complete" && notification.meta?.taskId) {
-      await Task.findByIdAndUpdate(
-        notification.meta.taskId,
-        { taskStatusId: STATUS['complete'] },
-        { new: true }
-      );
-    }
+    // if (notification.type === "task-complete" && notification.meta?.taskId) {
+    //   await Task.findByIdAndUpdate(
+    //     notification.meta.taskId,
+    //     { taskStatusId: STATUS['complete'] },
+    //     { new: true }
+    //   );
+    // }
 
     const Newnotification = new Notification({
       message:`Your ${notification.type} has been ${newStatus}`,
