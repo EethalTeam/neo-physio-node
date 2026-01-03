@@ -1,200 +1,197 @@
-const Physio = require('../../model/masterModels/Physio');
-const mongoose = require('mongoose')
-
+const Physio = require("../../model/masterModels/Physio");
+const mongoose = require("mongoose");
 
 exports.createPhysio = async (req, res) => {
-    try {
-        const {
-            physioName,
-            physioAge,
-            physioGenderId,
-            physioContactNo,
-            physioSpcl,
-            physioQulifi,
-            physioExp,
-            physioPAN,
-            physioAadhar,
-            physioSalary,
-            physioProbation,
-            physioINCRDate,
-            physioPetrolAlw,
-            physioVehicleMTC,
-            physioIncentive,
-            isActive,
-            physioNote,
-            physioDescription,
-             password,
-            roleId,
-        } = req.body;
-  
-    const lastPhysio = await Physio.findOne({}, {}, { sort: { 'createdAt': -1 } });
+  try {
+    const {
+      physioName,
+      physioAge,
+      physioGenderId,
+      physioContactNo,
+      physioSpcl,
+      physioQulifi,
+      physioExp,
+      physioPAN,
+      physioAadhar,
+      physioSalary,
+      physioProbation,
+      physioINCRDate,
+      physioPetrolAlw,
+      physioVehicleMTC,
+      physioIncentive,
+      isActive,
+      physioNote,
+      physioDescription,
+      password,
+      roleId,
+    } = req.body;
+
+    const lastPhysio = await Physio.findOne(
+      {},
+      {},
+      { sort: { createdAt: -1 } }
+    );
     let nextPhysioNumber = 1;
-    
+
     if (lastPhysio && lastPhysio.physioCode) {
-      const lastNumber = parseInt(lastPhysio.physioCode.replace('PHYSIO', ''));
+      const lastNumber = parseInt(lastPhysio.physioCode.replace("PHYSIO", ""));
       nextPhysioNumber = isNaN(lastNumber) ? 1 : lastNumber + 1;
     }
-    
-    const physioCode = `PHYSIO${String(nextPhysioNumber).padStart(3, '0')}`;
-    
-        const newPhysio = new Physio({
-            physioCode,
-            physioAge,
-            physioName,
-            physioGenderId,
-            physioContactNo,
-            physioSpcl,
-            physioQulifi,
-            physioExp,
-            physioPAN,
-            physioAadhar,
-            physioSalary,
-            physioProbation,
-            physioINCRDate,
-            physioPetrolAlw,
-            physioVehicleMTC,
-            physioIncentive,
-            isActive,
-            physioNote,
-            physioDescription,
-            password,
-            roleId
 
-        });
-        
-        const savedPhysio = await newPhysio.save();
-        res.status(201).json(savedPhysio);
+    const physioCode = `PHYSIO${String(nextPhysioNumber).padStart(3, "0")}`;
 
-    } catch (error) {
-        if (error.code === 11000) {
-            return res.status(400).json({ message: 'Physio code already exists.' });
-        }
-        if (error.name === 'ValidationError') {
-            return res.status(400).json({ message: error.message });
-        }
-        res.status(500).json({ message: error.message });
+    const newPhysio = new Physio({
+      physioCode,
+      physioAge,
+      physioName,
+      physioGenderId,
+      physioContactNo,
+      physioSpcl,
+      physioQulifi,
+      physioExp,
+      physioPAN,
+      physioAadhar,
+      physioSalary,
+      physioProbation,
+      physioINCRDate,
+      physioPetrolAlw,
+      physioVehicleMTC,
+      physioIncentive,
+      isActive,
+      physioNote,
+      physioDescription,
+      password,
+      roleId,
+    });
+
+    const savedPhysio = await newPhysio.save();
+    res.status(201).json(savedPhysio);
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(400).json({ message: "Physio code already exists." });
     }
+    if (error.name === "ValidationError") {
+      return res.status(400).json({ message: error.message });
+    }
+    res.status(500).json({ message: error.message });
+  }
 };
 
 exports.getAllPhysios = async (req, res) => {
-    try {
-        const page = parseInt(req.body.page) || 1;
-        const limit = parseInt(req.body.limit) || 10;
-        const skip = (page - 1) * limit;
-        const {type}=req.body
-        const filter={}
-        if(type===undefined){
-          filter.isActive=true
-        }
-        const physios = await Physio.find(filter) 
-            .populate('physioGenderId').populate('roleId','RoleName')
-            .skip(skip)
-            .limit(limit)
-            .sort({ createdAt: -1 });
-
-        const totalPhysios = await Physio.countDocuments({ isActive: true });
-
-        res.status(200).json({
-            totalPhysios,
-            totalPages: Math.ceil(totalPhysios / limit),
-            currentPage: page,
-            physios
-        });
-
-    } catch (error) {
-        res.status(500).json({ message: error.message });
+  try {
+    // const page = parseInt(req.body.page) || 1;
+    // const limit = parseInt(req.body.limit) || 10;
+    // const skip = (page - 1) * limit;
+    const { type } = req.body;
+    const filter = {};
+    if (type === undefined) {
+      filter.isActive = true;
     }
+    const physios = await Physio.find(filter)
+      .populate("physioGenderId")
+      .populate("roleId", "RoleName")
+      // .skip(skip)
+      // .limit(limit)
+      .sort({ createdAt: -1 });
+
+    const totalPhysios = await Physio.countDocuments({ isActive: true });
+
+    res.status(200).json({
+      totalPhysios,
+      // totalPages: Math.ceil(totalPhysios / limit),
+      // currentPage: page,
+      physios,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 exports.getPhysioById = async (req, res) => {
-    try {
-        
-        const { _id } = req.body; 
-        if (!_id) {
-            return res.status(400).json({ message: 'Physio ID is required in the body.' });
-        }
-
-        const physio = await Physio.findById(_id)
-            .populate('physioGenderId');
-
-        if (!physio) {
-            return res.status(404).json({ message: 'Physio not found' });
-        }
-
-        res.status(200).json(physio);
-
-    } catch (error) {
-        if (error.name === 'CastError') {
-             return res.status(400).json({ message: 'Invalid Physio ID' });
-        }
-        res.status(500).json({ message: error.message });
+  try {
+    const { _id } = req.body;
+    if (!_id) {
+      return res
+        .status(400)
+        .json({ message: "Physio ID is required in the body." });
     }
+
+    const physio = await Physio.findById(_id).populate("physioGenderId");
+
+    if (!physio) {
+      return res.status(404).json({ message: "Physio not found" });
+    }
+
+    res.status(200).json(physio);
+  } catch (error) {
+    if (error.name === "CastError") {
+      return res.status(400).json({ message: "Invalid Physio ID" });
+    }
+    res.status(500).json({ message: error.message });
+  }
 };
 
 exports.updatePhysio = async (req, res) => {
-    try {
-        
-        const { _id, ...updateData } = req.body;
-        
-        if (!_id) {
-            return res.status(400).json({ message: 'Physio ID is required in the body for updates.' });
-        }
+  try {
+    const { _id, ...updateData } = req.body;
 
-        const updatedPhysio = await Physio.findByIdAndUpdate(
-            _id,
-            updateData,
-     
-            { new: true, runValidators: true } 
-        );
-
-        if (!updatedPhysio) {
-            return res.status(404).json({ message: 'Physio not found' });
-        }
-
-        res.status(200).json(updatedPhysio);
-
-    } catch (error) {
-        if (error.code === 11000) {
-            return res.status(400).json({ message: 'Physio code already exists.' });
-        }
-        if (error.name === 'ValidationError') {
-            return res.status(400).json({ message: error.message });
-        }
-        res.status(500).json({ message: error.message });
+    if (!_id) {
+      return res
+        .status(400)
+        .json({ message: "Physio ID is required in the body for updates." });
     }
+
+    const updatedPhysio = await Physio.findByIdAndUpdate(
+      _id,
+      updateData,
+
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedPhysio) {
+      return res.status(404).json({ message: "Physio not found" });
+    }
+
+    res.status(200).json(updatedPhysio);
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(400).json({ message: "Physio code already exists." });
+    }
+    if (error.name === "ValidationError") {
+      return res.status(400).json({ message: error.message });
+    }
+    res.status(500).json({ message: error.message });
+  }
 };
 
 exports.deletePhysio = async (req, res) => {
-    try {
-        
-        const { _id } = req.body;
-        if (!_id) {
-            return res.status(400).json({ message: 'Physio ID is required in the body.' });
-        }
-
-        // Soft delete
-        const softDeletedPhysio = await Physio.findByIdAndUpdate(
-            _id,
-            { isActive: false },
-            { new: true }
-        );
-
-        if (!softDeletedPhysio) {
-            return res.status(404).json({ message: 'Physio not found' });
-        }
-
-        res.status(200).json({ message: 'Physio deactivated successfully' });
-
-    } catch (error) {
-        if (error.name === 'CastError') {
-             return res.status(400).json({ message: 'Invalid Physio ID' });
-        }
-        res.status(500).json({ message: error.message });
+  try {
+    const { _id } = req.body;
+    if (!_id) {
+      return res
+        .status(400)
+        .json({ message: "Physio ID is required in the body." });
     }
+
+    // Soft delete
+    const softDeletedPhysio = await Physio.findByIdAndUpdate(
+      _id,
+      { isActive: false },
+      { new: true }
+    );
+
+    if (!softDeletedPhysio) {
+      return res.status(404).json({ message: "Physio not found" });
+    }
+
+    res.status(200).json({ message: "Physio deactivated successfully" });
+  } catch (error) {
+    if (error.name === "CastError") {
+      return res.status(400).json({ message: "Invalid Physio ID" });
+    }
+    res.status(500).json({ message: error.message });
+  }
 };
-
-
-
 
 // LOGIN Physio
 exports.loginPhysio = async (req, res) => {
@@ -208,7 +205,10 @@ exports.loginPhysio = async (req, res) => {
     // }
 
     // 2. Find employee by email
-    const physio = await Physio.findOne({ physioCode: physioCode }).populate("roleId","RoleName")
+    const physio = await Physio.findOne({ physioCode: physioCode }).populate(
+      "roleId",
+      "RoleName"
+    );
     if (!physio) {
       return res.status(404).json({ message: "Invalid Employee Code" });
     }
@@ -229,10 +229,9 @@ exports.loginPhysio = async (req, res) => {
         _id: physio._id,
         physioName: physio.physioName,
         physioCode: physio.physioCode,
-        role:physio.roleId.RoleName
+        role: physio.roleId.RoleName,
       },
     });
-
   } catch (error) {
     console.error("Login error:", error);
     res.status(500).json({ message: "Login failed", error: error.message });
@@ -269,7 +268,6 @@ exports.logoutUser = async (_id) => {
   try {
     // Update lastActive or any other logout tracking if needed
     await Physio.findByIdAndUpdate(_id, { isCurrentlyLoggedIn: false });
-
   } catch (err) {
     console.error("❌ Error logging out user:", err.message);
   }
