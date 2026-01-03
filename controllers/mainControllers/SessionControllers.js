@@ -294,7 +294,7 @@ exports.SessionCancel = async (req, res) => {
             const patient = await Patient.findById(cancelledSession.patientId);
             
             const roles = await RoleBased.find({ 
-                roleName: { $in: ["Admin", "SuperAdmin", "HOD"] } 
+                RoleName: { $in: ["Admin", "SuperAdmin", "HOD"] } 
             });
             const roleIds = roles.map(r => r._id);
 
