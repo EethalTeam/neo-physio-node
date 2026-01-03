@@ -201,11 +201,11 @@ exports.loginPhysio = async (req, res) => {
   try {
     const { physioCode, password } = req.body;
     // 1. Reject if request is from mobile device
-    const userAgent = req.headers["user-agent"] || "";
-    const isMobile = /mobile|android|iphone|ipad|phone/i.test(userAgent);
-    if (isMobile) {
-      return res.status(403).json({ message: "Login from mobile devices is not allowed" });
-    }
+    // const userAgent = req.headers["user-agent"] || "";
+    // const isMobile = /mobile|android|iphone|ipad|phone/i.test(userAgent);
+    // if (isMobile) {
+    //   return res.status(403).json({ message: "Login from mobile devices is not allowed" });
+    // }
 
     // 2. Find employee by email
     const physio = await Physio.findOne({ physioCode: physioCode }).populate("roleId","RoleName")
