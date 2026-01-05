@@ -154,7 +154,7 @@ const createNotification = async ({ type, message, fromEmployeeId, toEmployeeId 
 // ---------------- MONGODB CONNECTION ----------------
 async function main() {
   try {
-    await mongoose.connect('mongodb+srv://eethaldev:eethaldevteam123@goldsun.pazhgof.mongodb.net/neo-physio?retryWrites=true&w=majority&appName=NEO-PHYSIO', {
+    await mongoose.connect('mongodb+srv://restore_admin:enisrestore123@enistechteam.owwtldg.mongodb.net/neo-physio?retryWrites=true&w=majority&appName=NEO-PHYSIO', {
       serverSelectionTimeoutMS: 30000,
       socketTimeoutMS: 45000,
       connectTimeoutMS: 30000,
