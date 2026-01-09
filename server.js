@@ -178,6 +178,7 @@ async function main() {
         connectTimeoutMS: 30000,
       }
     );
+
     console.log("✅ MongoDB successfully connected");
 
     server.listen(PORT, () => {
