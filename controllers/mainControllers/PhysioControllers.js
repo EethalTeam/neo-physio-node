@@ -172,26 +172,34 @@ exports.deletePhysio = async (req, res) => {
         .status(400)
         .json({ message: "Physio ID is required in the body." });
     }
-
-    // Soft delete
-    const softDeletedPhysio = await Physio.findByIdAndUpdate(
-      _id,
-      { isActive: false },
-      { new: true }
-    );
-
-    if (!softDeletedPhysio) {
-      return res.status(404).json({ message: "Physio not found" });
+    const physio = await Physio.findByIdAndDelete(_id);
+    if (!physio) {
+      return res.status(400).json({ message: "Physio not found" });
     }
-
-    res.status(200).json({ message: "Physio deactivated successfully" });
+    res.status(200).json({ message: "Physio deleted successfully" });
   } catch (error) {
-    if (error.name === "CastError") {
-      return res.status(400).json({ message: "Invalid Physio ID" });
-    }
     res.status(500).json({ message: error.message });
   }
 };
+// Soft delete
+//     const softDeletedPhysio = await Physio.findByIdAndUpdate(
+//       _id,
+//       { isActive: false },
+//       { new: true }
+//     );
+
+//     if (!softDeletedPhysio) {
+//       return res.status(404).json({ message: "Physio not found" });
+//     }
+
+//     res.status(200).json({ message: "Physio deactivated successfully" });
+//   } catch (error) {
+//     if (error.name === "CastError") {
+//       return res.status(400).json({ message: "Invalid Physio ID" });
+//     }
+//     res.status(500).json({ message: error.message });
+//   }
+// };
 
 // LOGIN Physio
 exports.loginPhysio = async (req, res) => {

@@ -1,16 +1,16 @@
-const mongoose = require('mongoose');
-const express = require('express');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const http = require('http');
-const { Server } = require('socket.io');
+const mongoose = require("mongoose");
+const express = require("express");
+const cors = require("cors");
+const bodyParser = require("body-parser");
+const http = require("http");
+const { Server } = require("socket.io");
 
-const masterRoutes = require('./router/masterRoutes');
-const mainRoutes = require('./router/mainRoutes');
+const masterRoutes = require("./router/masterRoutes");
+const mainRoutes = require("./router/mainRoutes");
 // const authRoutes = require('./routes/authRoutes');
 
 // --- UNCOMMENTED FOR NOTIFICATIONS ---
-const Notification = require('./model/masterModels/Notification');
+const Notification = require("./model/masterModels/Notification");
 // const Group = require('./models/masterModels/Group');
 // const Message = require('./models/masterModels/Message');
 
@@ -21,18 +21,20 @@ const app = express();
 const PORT = 8001;
 
 // app.use(bodyParser.json());
-app.use(express.json({
-  verify: (req, res, buf) => {
-    req.rawBody = buf; // Save the raw buffer to the request object
-  }
-}));
+app.use(
+  express.json({
+    verify: (req, res, buf) => {
+      req.rawBody = buf; // Save the raw buffer to the request object
+    },
+  })
+);
 app.use(cors());
-require('dotenv').config();
+require("dotenv").config();
 
 // app.post('/api/chatWithGemini', (req,res)=>{
 //   console.log(req.body,"req.body")
 // })
-app.get('/privacy', (req, res) => {
+app.get("/privacy", (req, res) => {
   res.send(`
     <h1>Privacy Policy</h1>
     <p>We collect and process data such as employee names, phone numbers, email addresses, and task details.</p>
@@ -42,10 +44,10 @@ app.get('/privacy', (req, res) => {
   `);
 });
 
-app.use('/api', masterRoutes);
-app.use('/api', mainRoutes);
+app.use("/api", masterRoutes);
+app.use("/api", mainRoutes);
 
-app.get('/test', (req, res) => {
+app.get("/test", (req, res) => {
   res.send("Testing mongo db url");
 });
 
@@ -67,8 +69,6 @@ const io = new Server(server, {
 
 const employeeSockets = new Map(); // employeeId -> Set of socketIds
 
-
-
 io.on("connection", (socket) => {
   console.log("⚡ A client connected:", socket.id);
 
@@ -84,24 +84,33 @@ io.on("connection", (socket) => {
 
     console.log(`Socket ${socket.id} joined personal room: ${employeeId}`);
   });
-  
-  // ================== Send Message (Notification) ==================
-  socket.on("sendMessage", async ({ type, message, toEmployeeId = null, groupId = null, meta = {} }) => {
-    try {
-      const notification = await createNotification({
-        type,
-        message,
-        fromEmployeeId: socket.employeeId,
-        toEmployeeId,
-        groupId,
-        meta,
-      });
 
-      console.log("✅ Notification created:", notification._id);
-    } catch (err) {
-      console.error("❌ Error sending notification:", err.message);
+  // ================== Send Message (Notification) ==================
+  socket.on(
+    "sendMessage",
+    async ({
+      type,
+      message,
+      toEmployeeId = null,
+      groupId = null,
+      meta = {},
+    }) => {
+      try {
+        const notification = await createNotification({
+          type,
+          message,
+          fromEmployeeId: socket.employeeId,
+          toEmployeeId,
+          groupId,
+          meta,
+        });
+
+        console.log("✅ Notification created:", notification._id);
+      } catch (err) {
+        console.error("❌ Error sending notification:", err.message);
+      }
     }
-  });
+  );
 
   // ================== Disconnect ==================
   socket.on("disconnect", () => {
@@ -118,7 +127,14 @@ io.on("connection", (socket) => {
 });
 
 // ---------------- HELPER: CREATE NOTIFICATION ----------------
-const createNotification = async ({ type, message, fromEmployeeId, toEmployeeId = null, groupId = null, meta = {} }) => {
+const createNotification = async ({
+  type,
+  message,
+  fromEmployeeId,
+  toEmployeeId = null,
+  groupId = null,
+  meta = {},
+}) => {
   try {
     const notificationData = {
       type,
@@ -141,7 +157,7 @@ const createNotification = async ({ type, message, fromEmployeeId, toEmployeeId 
     // Emit via socket if online
     if (toEmployeeId) {
       io.to(toEmployeeId.toString()).emit("receiveNotification", notification);
-    } 
+    }
     // Group chat emission remains commented out/skipped as requested
 
     return notification;
@@ -154,11 +170,14 @@ const createNotification = async ({ type, message, fromEmployeeId, toEmployeeId 
 // ---------------- MONGODB CONNECTION ----------------
 async function main() {
   try {
-    await mongoose.connect('mongodb+srv://eethaldev:eethaldevteam123@goldsun.pazhgof.mongodb.net/neo-physio?retryWrites=true&w=majority&appName=NEO-PHYSIO', {
-      serverSelectionTimeoutMS: 30000,
-      socketTimeoutMS: 45000,
-      connectTimeoutMS: 30000,
-    });
+    await mongoose.connect(
+      "mongodb+srv://restore_admin:enisrestore123@enistechteam.owwtldg.mongodb.net/neo-physio?retryWrites=true&w=majority&appName=NEO-PHYSIO",
+      {
+        serverSelectionTimeoutMS: 30000,
+        socketTimeoutMS: 45000,
+        connectTimeoutMS: 30000,
+      }
+    );
     console.log("✅ MongoDB successfully connected");
 
     server.listen(PORT, () => {
