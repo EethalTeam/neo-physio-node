@@ -93,8 +93,7 @@ exports.createPatients = async (req, res) => {
     // Assign the new patientCode
     const newHnpCode = `HNP${String(nextId).padStart(6, "0")}`;
 
-    // Create and save the Patient
-    const patients = new Patient({
+    const createData={
       patientName,
       patientCode: newHnpCode,
       isActive,
@@ -112,7 +111,6 @@ exports.createPatients = async (req, res) => {
       patientAddress,
       patientPinCode,
       patientCondition,
-      physioId,
       reviewDate,
       MedicalHistoryAndRiskFactor,
       otherMedCon,
@@ -153,10 +151,19 @@ exports.createPatients = async (req, res) => {
       Satisfaction,
       kmsFromPrevious,
       reviewFrequency,
-      FeesTypeId,
       feeAmount,
-      ReferenceId,
-    });
+    }
+    if(ReferenceId){
+      createData.ReferenceId=ReferenceId
+    }
+    if(FeesTypeId){
+      createData.FeesTypeId=FeesTypeId
+    }
+    if(physioId){
+      createData.physioId=physioId
+    }
+    // Create and save the Patient
+    const patients = new Patient(createData);
     await patients.save();
 
     res.status(200).json({
