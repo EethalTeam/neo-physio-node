@@ -39,13 +39,13 @@ exports.createSession = async (req, res) => {
     const lastSession = await Session.findOne(
       {},
       {},
-      { sort: { createdAt: -1 } }
+      { sort: { createdAt: -1 } },
     );
     let nextSessionNumber = 1;
 
     if (lastSession && lastSession.sessionCode) {
       const lastNumber = parseInt(
-        lastSession.sessionCode.replace("SESSION", "")
+        lastSession.sessionCode.replace("SESSION", ""),
       );
       nextSessionNumber = isNaN(lastNumber) ? 1 : lastNumber + 1;
     }
@@ -86,38 +86,79 @@ exports.createSession = async (req, res) => {
 };
 
 // Get all Session
-exports.getAllSession = async (req, res) => {
+// exports.getAllSession = async (req, res) => {
+//   try {
+//     const { sessionDate, nextDate, physioId, storedRole } = req.body;
+//     let filter = {};
+//     if (sessionDate) {
+//       filter.sessionDate = { $gte: sessionDate, $lt: nextDate };
+//     }
+//     if (
+//       physioId &&
+//       storedRole !== "SuperAdmin" &&
+//       storedRole !== "Admin" &&
+//       storedRole !== "HOD"
+//     ) {
+//       filter.physioId = physioId;
+//     }
+
+//     const session = await Session.find(filter)
+//       .populate("physioId", "physioName")
+//       .populate("modalitiesList.modalityId", "modalitiesName")
+//       .populate("patientId", "patientName")
+//       .populate("machineId", "machineName")
+//       .populate(
+//         "sessionStatusId",
+//         "sessionStatusName sessionStatusColor sessionStatusTextColor",
+//       )
+//       .populate("redFlags.redFlagId", "redflagName");
+//     if (!session) {
+//       res.status(400).json({ message: "Session is not found" });
+//     }
+
+//     res.status(200).json(session);
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// };
+exports.getAllSessions = async (req, res) => {
   try {
     const { sessionDate, nextDate, physioId, storedRole } = req.body;
+
+    //ALWAYS define filter first
     let filter = {};
-    if (sessionDate) {
-      filter.sessionDate = { $gte: sessionDate, $lt: nextDate };
+
+    // Date filter
+    if (sessionDate && nextDate) {
+      filter.sessionDate = {
+        $gte: new Date(sessionDate),
+        $lt: new Date(nextDate),
+      };
     }
-    if (
-      physioId &&
-      storedRole !== "SuperAdmin" &&
-      storedRole !== "Admin" &&
-      storedRole !== "HOD"
-    ) {
+
+    //  Role based filter
+    if (storedRole === "Physio" && physioId) {
       filter.physioId = physioId;
     }
 
-    const session = await Session.find(filter)
+    const sessions = await Session.find(filter)
       .populate("physioId", "physioName")
+      .populate({
+        path: "patientId",
+        populate: { path: "patientGenderId", select: "genderName" },
+      })
       .populate("modalitiesList.modalityId", "modalitiesName")
-      .populate("patientId", "patientName")
       .populate("machineId", "machineName")
       .populate(
         "sessionStatusId",
-        "sessionStatusName sessionStatusColor sessionStatusTextColor"
+        "sessionStatusName sessionStatusColor sessionStatusTextColor",
       )
       .populate("redFlags.redFlagId", "redflagName");
-    if (!session) {
-      res.status(400).json({ message: "Session is not found" });
-    }
 
-    res.status(200).json(session);
+    // Always return array
+    return res.status(200).json(sessions || []);
   } catch (error) {
+    console.error("Get all sessions error:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -187,7 +228,7 @@ exports.updateSession = async (req, res) => {
           media,
         },
       },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!session) {
@@ -238,7 +279,7 @@ exports.SessionStart = async (req, res) => {
       {
         $set: { sessionFromTime: sessionFromTime, sessionStatusId: Status._id },
       },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
     if (!session) {
       res.status(400).json({ message: "Session not started" });
@@ -267,7 +308,7 @@ exports.SessionCancel = async (req, res) => {
           sessionFeedbackCons: cancelledReason,
         },
       },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
     console.log(cancelledSession, "cancelledSession");
     if (!cancelledSession) {
@@ -290,7 +331,7 @@ exports.SessionCancel = async (req, res) => {
       const counter = await Counter.findByIdAndUpdate(
         { _id: "sessionCode" },
         { $inc: { seq: 1 } },
-        { new: true, upsert: true }
+        { new: true, upsert: true },
       );
 
       const formattedCode = `SESS-${String(counter.seq).padStart(6, "0")}`;
@@ -310,7 +351,7 @@ exports.SessionCancel = async (req, res) => {
         sessionDate: nextDate,
         sessionTime: cancelledSession.sessionTime,
         sessionStatusId: new mongoose.Types.ObjectId(
-          "691ecb36b87c5c57dead47a7"
+          "691ecb36b87c5c57dead47a7",
         ),
         sessionDay: daysOfWeek[nextDate.getDay()],
         sessionCode: formattedCode,
@@ -330,7 +371,7 @@ exports.SessionCancel = async (req, res) => {
       });
 
       const recipientIds = new Set(
-        staffToNotify.map((emp) => emp._id.toString())
+        staffToNotify.map((emp) => emp._id.toString()),
       );
       if (cancelledSession.physioId) {
         recipientIds.add(cancelledSession.physioId.toString());
@@ -361,7 +402,7 @@ exports.SessionCancel = async (req, res) => {
           if (io) {
             io.to(empId).emit("receiveNotification", notification);
           }
-        }
+        },
       );
 
       await Promise.all(notificationPromises);
@@ -389,7 +430,7 @@ exports.SessionCancel = async (req, res) => {
             finalDailyKms: kmsToAdd,
           },
         },
-        { new: true, upsert: true }
+        { new: true, upsert: true },
       );
     }
   } catch (error) {
@@ -436,7 +477,7 @@ exports.SessionEnd = async (req, res) => {
     const session = await Session.findByIdAndUpdate(
       _id,
       { $set: sessionend },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!session) {
@@ -500,7 +541,7 @@ exports.SessionEnd = async (req, res) => {
               if (io) {
                 io.to(hod._id.toString()).emit(
                   "receiveNotification",
-                  notification
+                  notification,
                 );
               }
             });
@@ -539,7 +580,7 @@ exports.SessionEnd = async (req, res) => {
             finalDailyKms: kmsToAdd,
           },
         },
-        { new: true, upsert: true }
+        { new: true, upsert: true },
       );
     }
 

@@ -12,7 +12,7 @@ const RiskFactorSubSchema = new mongoose.Schema(
       default: false,
     },
   },
-  { _id: false }
+  { _id: false },
 );
 
 const patientSchema = new mongoose.Schema(
@@ -115,6 +115,19 @@ const patientSchema = new mongoose.Schema(
       trim: true,
     },
     postureOrGaitAnalysis: {
+      type: String,
+      trim: true,
+    },
+
+    static: {
+      type: String,
+      trim: true,
+    },
+    dynamic: {
+      type: String,
+      trim: true,
+    },
+    coordination: {
       type: String,
       trim: true,
     },
@@ -248,7 +261,7 @@ const patientSchema = new mongoose.Schema(
       ref: "Reference",
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 const PatientModel = mongoose.model("Patient", patientSchema);
 module.exports = PatientModel;

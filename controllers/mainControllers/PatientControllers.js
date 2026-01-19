@@ -38,6 +38,9 @@ exports.createPatients = async (req, res) => {
       muscleStrength,
       postureOrGaitAnalysis,
       functionalLimitations,
+      static,
+      dynamic,
+      coordination,
       ADLAbility,
       shortTermGoals,
       goalDescription,
@@ -67,16 +70,33 @@ exports.createPatients = async (req, res) => {
       ReferenceId,
     } = req.body;
     // Check for duplicates (if needed)
-    const existingPatient = await Patient.findOne({ patientCode: patientCode });
-    if (existingPatient) {
-      return res
-        .status(400)
-        .json({ message: "Patient with this code  already exists" });
+    // const existingPatient = await Patient.findOne({ patientCode: patientCode });
+    // if (existingPatient) {
+    //   return res
+    //     .status(400)
+    //     .json({ message: "Patient with this code  already exists" });
+    // }
+
+    // Get the last HNP patient to continue numbering
+    const lastHnpPatient = await Patient.find({
+      patientCode: { $regex: /^HNP/ },
+    })
+      .sort({ createdAt: -1 })
+      .limit(1);
+
+    let nextId = 1;
+    if (lastHnpPatient.length > 0) {
+      nextId =
+        parseInt(lastHnpPatient[0].patientCode.replace("HNP", ""), 10) + 1;
     }
+
+    // Assign the new patientCode
+    const newHnpCode = `HNP${String(nextId).padStart(6, "0")}`;
+
     // Create and save the Patient
     const patients = new Patient({
       patientName,
-      patientCode,
+      patientCode: newHnpCode,
       isActive,
       consultationDate,
       historyOfFall,
@@ -106,6 +126,9 @@ exports.createPatients = async (req, res) => {
       muscleStrength,
       postureOrGaitAnalysis,
       functionalLimitations,
+      static,
+      dynamic,
+      coordination,
       ADLAbility,
       shortTermGoals,
       goalDescription,
@@ -146,7 +169,21 @@ exports.createPatients = async (req, res) => {
 };
 // Get all Patient
 exports.getAllPatients = async (req, res) => {
+  // Replace all old CON codes sequentially (one-time, in-place)
   try {
+    const conPatients = await Patient.find({
+      patientCode: { $regex: /^CON/ },
+    }).sort({ createdAt: 1 });
+    if (conPatients.length > 0) {
+      let counter = 1;
+      for (const patient of conPatients) {
+        patient.patientCode = `HNP${String(counter).padStart(6, "0")}`;
+        await patient.save();
+        counter++;
+      }
+    }
+
+    // try {
     const Patients = await Patient.find()
       .populate("patientGenderId", "genderName")
       .populate("MedicalHistoryAndRiskFactor.RiskFactorID", "RiskFactorName")
@@ -210,6 +247,9 @@ exports.updatePatients = async (req, res) => {
       muscleStrength,
       postureOrGaitAnalysis,
       functionalLimitations,
+      static,
+      dynamic,
+      coordination,
       ADLAbility,
       shortTermGoals,
       goalDescription,
@@ -275,6 +315,9 @@ exports.updatePatients = async (req, res) => {
           muscleStrength,
           postureOrGaitAnalysis,
           functionalLimitations,
+          static,
+          dynamic,
+          coordination,
           ADLAbility,
           shortTermGoals,
           goalDescription,
@@ -305,7 +348,7 @@ exports.updatePatients = async (req, res) => {
           isRecovered,
         },
       },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!Patients) {
@@ -376,7 +419,7 @@ exports.AssignPhysio = async (req, res) => {
           kmsFromPrevious,
         },
       },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!AssignPhysio) {
@@ -388,7 +431,7 @@ exports.AssignPhysio = async (req, res) => {
     const counter = await Counter.findByIdAndUpdate(
       { _id: "sessionCode" },
       { $inc: { seq: totalSessionDays } },
-      { new: true, upsert: true }
+      { new: true, upsert: true },
     );
 
     let nextSequenceNumber = counter.seq - totalSessionDays + 1;
@@ -419,7 +462,7 @@ exports.AssignPhysio = async (req, res) => {
       }
       const formattedCode = `SESS-${String(nextSequenceNumber).padStart(
         6,
-        "0"
+        "0",
       )}`;
 
       sessionsToCreate.push({
@@ -428,7 +471,7 @@ exports.AssignPhysio = async (req, res) => {
         sessionDate: new Date(currentDate),
         sessionTime: sessionTime,
         sessionStatusId: new mongoose.Types.ObjectId(
-          "691ecb36b87c5c57dead47a7"
+          "691ecb36b87c5c57dead47a7",
         ),
         sessionDay: daysOfWeek[currentDayIndex],
         sessionCode: formattedCode,
