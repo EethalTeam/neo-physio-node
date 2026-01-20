@@ -4,8 +4,10 @@ const mongoose = require("mongoose");
 exports.createPhysio = async (req, res) => {
   try {
     const {
+      physioCode,
       physioName,
-      physioAge,
+      // physioAge,
+      physioDob,
       physioGenderId,
       physioContactNo,
       physioSpcl,
@@ -26,23 +28,24 @@ exports.createPhysio = async (req, res) => {
       roleId,
     } = req.body;
 
-    const lastPhysio = await Physio.findOne(
-      {},
-      {},
-      { sort: { createdAt: -1 } }
-    );
-    let nextPhysioNumber = 1;
+    // const lastPhysio = await Physio.findOne(
+    //   {},
+    //   {},
+    //   { sort: { createdAt: -1 } },
+    // );
+    // let nextPhysioNumber = 1;
 
-    if (lastPhysio && lastPhysio.physioCode) {
-      const lastNumber = parseInt(lastPhysio.physioCode.replace("PHYSIO", ""));
-      nextPhysioNumber = isNaN(lastNumber) ? 1 : lastNumber + 1;
-    }
+    // if (lastPhysio && lastPhysio.physioCode) {
+    //   const lastNumber = parseInt(lastPhysio.physioCode.replace("PHYSIO", ""));
+    //   nextPhysioNumber = isNaN(lastNumber) ? 1 : lastNumber + 1;
+    // }
 
-    const physioCode = `PHYSIO${String(nextPhysioNumber).padStart(3, "0")}`;
+    // const physioCode = `PHYSIO${String(nextPhysioNumber).padStart(3, "0")}`;
 
     const newPhysio = new Physio({
       physioCode,
-      physioAge,
+      // physioAge,
+      physioDob,
       physioName,
       physioGenderId,
       physioContactNo,
@@ -145,7 +148,7 @@ exports.updatePhysio = async (req, res) => {
       _id,
       updateData,
 
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!updatedPhysio) {
@@ -215,7 +218,7 @@ exports.loginPhysio = async (req, res) => {
     // 2. Find employee by email
     const physio = await Physio.findOne({ physioCode: physioCode }).populate(
       "roleId",
-      "RoleName"
+      "RoleName",
     );
     if (!physio) {
       return res.status(404).json({ message: "Invalid Employee Code" });

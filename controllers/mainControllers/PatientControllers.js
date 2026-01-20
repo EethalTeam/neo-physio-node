@@ -93,7 +93,7 @@ exports.createPatients = async (req, res) => {
     // Assign the new patientCode
     const newHnpCode = `HNP${String(nextId).padStart(6, "0")}`;
 
-    const createData={
+    const createData = {
       patientName,
       patientCode: newHnpCode,
       isActive,
@@ -152,15 +152,15 @@ exports.createPatients = async (req, res) => {
       kmsFromPrevious,
       reviewFrequency,
       feeAmount,
+    };
+    if (ReferenceId) {
+      createData.ReferenceId = ReferenceId;
     }
-    if(ReferenceId){
-      createData.ReferenceId=ReferenceId
+    if (FeesTypeId) {
+      createData.FeesTypeId = FeesTypeId;
     }
-    if(FeesTypeId){
-      createData.FeesTypeId=FeesTypeId
-    }
-    if(physioId){
-      createData.physioId=physioId
+    if (physioId) {
+      createData.physioId = physioId;
     }
     // Create and save the Patient
     const patients = new Patient(createData);
@@ -192,19 +192,83 @@ exports.getAllPatients = async (req, res) => {
 
     // try {
     const Patients = await Patient.find()
+      .populate("FeesTypeId", "feesTypeName")
       .populate("patientGenderId", "genderName")
       .populate("MedicalHistoryAndRiskFactor.RiskFactorID", "RiskFactorName")
       .populate("physioId", "physioName");
     if (!Patients) {
       res.status(400).json({ message: "patients is not found" });
     }
-
-    res.status(200).json(Patients);
+    const response = Patients.map((p) => ({
+      ...p._doc,
+      FeesTypeName: p.FeesTypeId?.feesTypeName || "N/A", // add this field
+    }));
+    res.status(200).json(response);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
-// Get a single Patient by name
+exports.getAllPatientsIncome = async (req, res) => {
+  try {
+    const { month, year } = req.body;
+    if (!month || !year) {
+      return res.status(400).json({ message: "Month and Year are required." });
+    }
+
+    const patients = await Patient.find()
+      .populate("FeesTypeId", "feesTypeName") // Correct field
+      .populate("patientGenderId", "genderName")
+      .populate("MedicalHistoryAndRiskFactor.RiskFactorID", "RiskFactorName")
+      .populate("physioId", "physioName");
+
+    const result = await Promise.all(
+      patients.map(async (p) => {
+        // Fetch sessions for the selected month
+        const sessions = await Session.find({
+          patientId: p._id,
+          sessionDate: {
+            $gte: new Date(year, month - 1, 1),
+            $lt: new Date(year, month, 1),
+          },
+        });
+
+        // Filter completed sessions
+        const completedSessions = sessions.filter(
+          (s) =>
+            s.sessionStatusId?.sessionStatusName &&
+            s.sessionStatusId.sessionStatusName.toLowerCase() === "completed",
+        );
+
+        const totalCompleted = completedSessions.length;
+
+        // Calculate total income
+        let totalIncome = 0;
+        const feeTypeName = p.FeesTypeId?.feesTypeName;
+
+        if (feeTypeName === "PerSession") {
+          totalIncome = (p.feeAmount || 0) * totalCompleted;
+        } else if (feeTypeName === "Monthly") {
+          totalIncome = p.feeAmount || 0;
+        }
+
+        return {
+          _id: p._id,
+          patientName: p.patientName,
+          feeType: feeTypeName || "N/A",
+          feePerSession: p.feeAmount || 0,
+          totalCompletedSessions: totalCompleted,
+          totalIncome,
+        };
+      }),
+    );
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
 exports.getByPatientsName = async (req, res) => {
   try {
     const Patients = await Patient.findOne({ patientName: req.body.name });

@@ -39,7 +39,10 @@ router.post("/Patient/getAllPatient", PatientControllers.getAllPatients);
 router.post("/Patient/getSinglePatient", PatientControllers.getByPatientsName);
 router.post("/Patient/updatePatient", PatientControllers.updatePatients);
 router.post("/Patient/deletePatient", PatientControllers.deletePatients);
-
+router.post(
+  "/Patient/getAllPatientsIncome",
+  PatientControllers.getAllPatientsIncome,
+);
 //Assign Physio
 router.post("/Patient/AssignPhysio", PatientControllers.AssignPhysio);
 
