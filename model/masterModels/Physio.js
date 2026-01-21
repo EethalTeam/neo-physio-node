@@ -29,6 +29,26 @@ const physioSChema = new mongoose.Schema(
       trim: true,
       required: true,
     },
+    physioAltno: {
+      type: String,
+      trim: true,
+      required: false,
+    },
+    physioAltno2: {
+      type: String,
+      trim: true,
+      required: false,
+    },
+    physiorelationAltno2: {
+      type: String,
+      trim: true,
+      required: false,
+    },
+    physiorelationAltno: {
+      type: String,
+      trim: true,
+      required: false,
+    },
     physioSpcl: {
       type: String,
       trim: true,

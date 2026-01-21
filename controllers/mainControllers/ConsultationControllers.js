@@ -391,9 +391,18 @@ exports.AssignPhysio = async (req, res) => {
       visitOrder,
       KmsfromHub,
       KmsfLPatienttoHub,
+      consultationNumber,
       kmsFromPrevious,
     } = req.body;
 
+    const existingPatient = await Patient.findOne({
+      patientNumber: consultationNumber,
+    });
+    if (existingPatient) {
+      return res
+        .status(400)
+        .json({ message: "Patient with this mobile number already exists" });
+    }
     const updatedConsultation = await Consultation.findByIdAndUpdate(
       _id,
       {
@@ -470,14 +479,14 @@ exports.AssignPhysio = async (req, res) => {
       ReferenceId,
     } = updatedConsultation;
 
-    const existingPatient = await Patient.findOne({
-      patientNumber: patientNumber,
-    });
-    if (existingPatient) {
-      return res
-        .status(400)
-        .json({ message: "Patient with this mobile number already exists" });
-    }
+    // const existingPatient = await Patient.findOne({
+    //   patientNumber: patientNumber,
+    // });
+    // if (existingPatient) {
+    //   return res
+    //     .status(400)
+    //     .json({ message: "Patient with this mobile number already exists" });
+    // }
     // Get last HNP patient
     const lastHnpPatient = await Patient.findOne({
       patientCode: { $regex: /^HNP/ },
@@ -491,7 +500,7 @@ exports.AssignPhysio = async (req, res) => {
     }
 
     const hnpPatientCode = `HNP${String(nextHnpNumber).padStart(6, "0")}`;
-
+    console.log(hnpPatientCode, "hnpPatientCode");
     const newPatient = new Patient({
       patientName,
       patientCode: hnpPatientCode,
@@ -553,6 +562,7 @@ exports.AssignPhysio = async (req, res) => {
       ReferenceId,
     });
     await newPatient.save();
+    console.log(newPatient, "newPatient");
 
     const counter = await Counter.findByIdAndUpdate(
       { _id: "sessionCode" },

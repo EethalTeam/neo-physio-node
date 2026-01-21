@@ -40,6 +40,10 @@ const patientSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    isConcernReceived: {
+      type: Boolean,
+      default: false,
+    },
     byStandar: {
       type: String,
       trim: true,

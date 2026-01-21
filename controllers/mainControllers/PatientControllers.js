@@ -349,6 +349,7 @@ exports.updatePatients = async (req, res) => {
       feeAmount,
       ReferenceId,
       isRecovered,
+      isConcernReceived,
     } = req.body;
 
     const Patients = await Patient.findByIdAndUpdate(
@@ -417,6 +418,7 @@ exports.updatePatients = async (req, res) => {
           feeAmount,
           ReferenceId,
           isRecovered,
+          isConcernReceived,
         },
       },
       { new: true, runValidators: true },
@@ -433,6 +435,52 @@ exports.updatePatients = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+exports.updatePatientGoals = async (req, res) => {
+  try {
+    const { patientId, shortTermGoals, longTermGoals } = req.body;
+
+    if (!patientId) {
+      return res.status(400).json({
+        success: false,
+        message: "Patient ID is required",
+      });
+    }
+
+    const updatedPatient = await Patient.findByIdAndUpdate(
+      patientId,
+      {
+        shortTermGoals,
+        longTermGoals,
+        updatedAt: new Date(),
+      },
+      {
+        new: true,
+        runValidators: true,
+      },
+    );
+
+    if (!updatedPatient) {
+      return res.status(404).json({
+        success: false,
+        message: "Patient not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Patient goals updated successfully",
+      data: updatedPatient,
+    });
+  } catch (error) {
+    console.error("Update Patient Goals Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
 // Delete a Patient
 exports.deletePatients = async (req, res) => {
   try {

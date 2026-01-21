@@ -43,6 +43,10 @@ router.post(
   "/Patient/getAllPatientsIncome",
   PatientControllers.getAllPatientsIncome,
 );
+router.post(
+  "/Patient/updatePatientGoals",
+  PatientControllers.updatePatientGoals,
+);
 //Assign Physio
 router.post("/Patient/AssignPhysio", PatientControllers.AssignPhysio);
 
@@ -55,6 +59,10 @@ router.post("/Expense/deleteExpense", ExpenseControllers.deleteExpense);
 
 //SessionControllers
 router.post("/Session/createSession", SessionControllers.createSession);
+router.post(
+  "/Session/getAllSessionsbyPatient",
+  SessionControllers.getAllSessionsbyPatient,
+);
 router.post("/Session/getAllSession", SessionControllers.getAllSessions);
 router.post("/Session/getSingleSession", SessionControllers.getSingleSession);
 router.post("/Session/updateSession", SessionControllers.updateSession);

@@ -162,6 +162,53 @@ exports.getAllSessions = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+exports.getAllSessionsbyPatient = async (req, res) => {
+  try {
+    const { sessionDate, nextDate, physioId, storedRole, patientId } = req.body;
+
+    //ALWAYS define filter first
+    let filter = {};
+
+    // Date filter
+    if (sessionDate && nextDate) {
+      filter.sessionDate = {
+        $gte: new Date(sessionDate),
+        $lt: new Date(nextDate),
+      };
+    }
+
+    if (patientId) {
+      const mongoose = require("mongoose");
+      filter.patientId = new mongoose.Types.ObjectId(patientId);
+    }
+
+    //  Role based filter
+    if (storedRole === "Physio" && physioId) {
+      filter.physioId = physioId;
+    }
+
+    const sessions = await Session.find(filter)
+      .populate("physioId", "physioName")
+      .populate({
+        path: "patientId",
+        populate: { path: "patientGenderId", select: "genderName" },
+      })
+      .populate("sessionFeedbackPros", "sessionFeedbackCons")
+      .populate("modalitiesList.modalityId", "modalitiesName")
+      .populate("machineId", "machineName")
+      .populate(
+        "sessionStatusId",
+        "sessionStatusName sessionStatusColor sessionStatusTextColor",
+      )
+      .populate("redFlags.redFlagId", "redflagName");
+
+    // Always return array
+    return res.status(200).json(sessions || []);
+  } catch (error) {
+    console.error("Get all sessions error:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
 
 // Get a single Session by id
 exports.getSingleSession = async (req, res) => {
