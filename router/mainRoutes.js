@@ -32,7 +32,7 @@ router.post("/Physio/loginPhysio", physioControllers.loginPhysio);
 router.post("/Physio/logoutPhysio", physioControllers.logoutPhysio);
 router.post("/Physio/logoutUser", physioControllers.logoutUser);
 router.post("/Physio/checkLogin", physioControllers.checkLogin);
-
+router.post("/Physio/markLeave", physioControllers.markLeave);
 //Patients
 router.post("/Patient/createPatient", PatientControllers.createPatients);
 router.post("/Patient/getAllPatient", PatientControllers.getAllPatients);
@@ -42,6 +42,10 @@ router.post("/Patient/deletePatient", PatientControllers.deletePatients);
 router.post(
   "/Patient/getAllPatientsIncome",
   PatientControllers.getAllPatientsIncome,
+);
+router.post(
+  "/Patient/sessionassignphysio",
+  PatientControllers.sessionAssignPhysio,
 );
 router.post(
   "/Patient/updatePatientGoals",
@@ -67,6 +71,7 @@ router.post("/Session/getAllSession", SessionControllers.getAllSessions);
 router.post("/Session/getSingleSession", SessionControllers.getSingleSession);
 router.post("/Session/updateSession", SessionControllers.updateSession);
 router.post("/Session/deleteSession", SessionControllers.deleteSession);
+router.post("/Session/sessionStock", SessionControllers.sessionStock);
 
 //Session Start and End
 

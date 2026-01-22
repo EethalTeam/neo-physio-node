@@ -336,6 +336,29 @@ exports.SessionStart = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+exports.sessionStock = async (req, res) => {
+  try {
+    const { _id, action } = req.body;
+
+    const Status = await SessionStatus.findOne({ sessionStatusName: action });
+    if (!Status) {
+      res.status(400).json({ message: "Session Status is not found" });
+    }
+    const session = await Session.findByIdAndUpdate(
+      _id,
+      {
+        $set: { sessionStatusId: Status._id },
+      },
+      { new: true, runValidators: true },
+    );
+    if (!session) {
+      res.status(400).json({ message: "Session not started" });
+    }
+    res.status(200).json(session);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 exports.SessionCancel = async (req, res) => {
   try {

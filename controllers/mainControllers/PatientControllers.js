@@ -78,6 +78,17 @@ exports.createPatients = async (req, res) => {
     // }
 
     // Get the last HNP patient to continue numbering
+    const existingPatient = await Patient.findOne({
+      patientNumber: patientNumber,
+    });
+
+    if (existingPatient) {
+      return res.status(200).json({
+        success: false,
+        message: "EXISTING_NUMBER",
+      });
+    }
+
     const lastHnpPatient = await Patient.find({
       patientCode: { $regex: /^HNP/ },
     })
@@ -499,6 +510,33 @@ exports.deletePatients = async (req, res) => {
     res.status(200).json({ message: "Patients deleted successfully" });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+exports.sessionAssignPhysio = async (req, res) => {
+  try {
+    const { newPhysioName, sessionCode, newPhysioId } = req.body;
+
+    const updated = await Session.updateOne(
+      {
+        sessionCode,
+      },
+      {
+        $set: {
+          physioId: newPhysioId,
+          physioName: newPhysioName,
+        },
+      },
+    );
+
+    if (!updated.matchedCount) {
+      return res.status(404).json({ message: "Session not found for today." });
+    }
+
+    res.json({ message: "Physio assigned successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
   }
 };
 

@@ -1,6 +1,6 @@
 const Physio = require("../../model/masterModels/Physio");
 const mongoose = require("mongoose");
-
+const LeaveModel = require("../../model/masterModels/Leave");
 exports.createPhysio = async (req, res) => {
   try {
     const {
@@ -84,6 +84,52 @@ exports.createPhysio = async (req, res) => {
     if (error.name === "ValidationError") {
       return res.status(400).json({ message: error.message });
     }
+    res.status(500).json({ message: error.message });
+  }
+};
+exports.markLeave = async (req, res) => {
+  try {
+    const { physioId, LeaveDate, LeaveMode } = req.body;
+
+    if (!physioId || !LeaveDate || !LeaveMode) {
+      return res.status(400).json({
+        message: "physioId, date, and leaveMode are required",
+      });
+    }
+    const existingLeave = await LeaveModel.findOne({
+      physioId: req.body.physioId,
+      LeaveDate: LeaveDate,
+    });
+    if (existingLeave) {
+      return res.status(400).json({
+        message: "Already leave exists for this physio with this date ",
+      });
+    }
+
+    const newLeave = new LeaveModel({
+      physioId,
+      LeaveDate,
+      LeaveMode,
+    });
+    console.log(newLeave, "newLeave");
+
+    const savedLeave = await newLeave.save();
+    console.log(savedLeave, "savedLeave");
+    const populateleave = await LeaveModel.findById(savedLeave._id).populate(
+      "physioId",
+      "physioName",
+    );
+    console.log(populateleave, "populateleave");
+    res.status(201).json({
+      success: true,
+      message: "Leave marked successfully",
+      data: populateleave,
+    });
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(400).json({ message: "Leave entry already exists." });
+    }
+
     res.status(500).json({ message: error.message });
   }
 };
