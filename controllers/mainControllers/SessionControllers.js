@@ -458,7 +458,7 @@ exports.SessionCancel = async (req, res) => {
               patient?.patientName || "Patient"
             } has been cancelled and the Reason is ${
               cancelledSession.sessionCancelReason
-            }. A replacement session has been scheduled.`,
+            } for the date of ${cancelledSession.sessionDate.toLocaleDateString()}. A replacement session has been scheduled.`,
             type: "general",
             status: "unseen",
             meta: {
