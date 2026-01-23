@@ -33,6 +33,7 @@ router.post("/Physio/logoutPhysio", physioControllers.logoutPhysio);
 router.post("/Physio/logoutUser", physioControllers.logoutUser);
 router.post("/Physio/checkLogin", physioControllers.checkLogin);
 router.post("/Physio/markLeave", physioControllers.markLeave);
+router.post("/Physio/getAllLeave", physioControllers.getAllLeave);
 //Patients
 router.post("/Patient/createPatient", PatientControllers.createPatients);
 router.post("/Patient/getAllPatient", PatientControllers.getAllPatients);

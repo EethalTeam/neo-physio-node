@@ -133,6 +133,40 @@ exports.markLeave = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+exports.getAllLeave = async (req, res) => {
+  try {
+    const { LeaveDate, isActive } = req.body;
+    const filter = {};
+
+    // Filter by LeaveDate if provided
+    if (LeaveDate) {
+      const date = new Date(LeaveDate);
+      const nextDate = new Date(date);
+      nextDate.setDate(nextDate.getDate() + 1);
+
+      // Filter for that exact day
+      filter.LeaveDate = {
+        $gte: date,
+        $lt: nextDate,
+      };
+    }
+
+    if (isActive !== undefined) {
+      filter.isActive = isActive;
+    }
+
+    const Leaves = await LeaveModel.find(filter)
+      .populate("physioId", "physioName") // populate only physioName
+      .sort({ LeaveDate: -1 });
+
+    res.status(200).json({
+      totalLeaves: Leaves.length,
+      Leaves,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
 
 exports.getAllPhysios = async (req, res) => {
   try {
