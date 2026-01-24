@@ -27,13 +27,14 @@ exports.getAllDashBoard = async (req, res) => {
             r.reviewStatusId?.reviewStatusName?.toLowerCase() === "completed",
         ),
       );
-
-    let patientRecover = await PatientModel.find({ isRecovered: true });
-    let physio = await Physio.find({ isActive: true });
     let year = new Date().getFullYear();
     let month = new Date().getMonth();
     let startDate = new Date(year, month, 1);
     let endDate = new Date(year, month + 1, 1);
+
+    let patientRecover = await PatientModel.find({ isRecovered: true });
+    let physio = await Physio.find({ isActive: true });
+
     let monthlySessions = await Session.find({
       sessionDate: { $gte: startDate, $lt: endDate },
     });
@@ -65,6 +66,7 @@ exports.getAllDashBoard = async (req, res) => {
       patient: patient.length,
       physio: physio.length,
       monthlySessions: monthlySessions.length,
+      // cancelledsession: cancelledsession.length,
       pendingreviews: pendingreviews.length,
       completedReview: completedReview.length,
       patientRecover: patientRecover.length,
