@@ -3,13 +3,14 @@ const Modalities = require("../../model/masterModels/Modalities ");
 
 // Create a new  Modalities
 exports.createModalities = async (req, res) => {
+  console.log(req.body);
   try {
     const { modalitiesCode, modalitiesName, modalitiestype, isActive } =
       req.body;
 
     // Check for duplicates (if needed)
     const existingModalities = await Modalities.findOne({
-      $or: [{ modalitiesName }, { modalitiesCode }, { modalitiestype }],
+      $or: [{ modalitiesName }, { modalitiesCode }],
     });
     if (existingModalities) {
       return res

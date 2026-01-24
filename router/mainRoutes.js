@@ -89,7 +89,7 @@ router.post(
 
 //DashBoardControllers
 router.post("/DashBoard/getAllDashBoard", DashBoardControllers.getAllDashBoard);
-
+router.post("/DashBoard/monthlyfunnel", DashBoardControllers.monthlyfunnel);
 //ConsultationControllers
 router.post(
   "/Consultation/createConsultation",

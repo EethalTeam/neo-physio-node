@@ -4,8 +4,8 @@ const LeaveModel = require("../../model/masterModels/Leave");
 exports.createPhysio = async (req, res) => {
   try {
     const {
-      physioCode,
       physioName,
+      EmpCode,
       // physioAge,
       physioDob,
       physioGenderId,
@@ -32,25 +32,26 @@ exports.createPhysio = async (req, res) => {
       roleId,
     } = req.body;
 
-    // const lastPhysio = await Physio.findOne(
-    //   {},
-    //   {},
-    //   { sort: { createdAt: -1 } },
-    // );
-    // let nextPhysioNumber = 1;
+    const lastPhysio = await Physio.findOne(
+      {},
+      {},
+      { sort: { createdAt: -1 } },
+    );
+    let nextPhysioNumber = 1;
 
-    // if (lastPhysio && lastPhysio.physioCode) {
-    //   const lastNumber = parseInt(lastPhysio.physioCode.replace("PHYSIO", ""));
-    //   nextPhysioNumber = isNaN(lastNumber) ? 1 : lastNumber + 1;
-    // }
+    if (lastPhysio && lastPhysio.physioCode) {
+      const lastNumber = parseInt(lastPhysio.physioCode.replace("PHYSIO", ""));
+      nextPhysioNumber = isNaN(lastNumber) ? 1 : lastNumber + 1;
+    }
 
-    // const physioCode = `PHYSIO${String(nextPhysioNumber).padStart(3, "0")}`;
+    const physioCode = `PHYSIO${String(nextPhysioNumber).padStart(3, "0")}`;
 
     const newPhysio = new Physio({
       physioCode,
       // physioAge,
       physioDob,
       physioName,
+      EmpCode,
       physioGenderId,
       physioContactNo,
       physioAltno,
