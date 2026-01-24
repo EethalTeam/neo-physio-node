@@ -360,7 +360,7 @@ exports.updatePatients = async (req, res) => {
       feeAmount,
       ReferenceId,
       isRecovered,
-      isConcernReceived,
+      isConsentReceived,
     } = req.body;
 
     const Patients = await Patient.findByIdAndUpdate(
@@ -429,7 +429,7 @@ exports.updatePatients = async (req, res) => {
           feeAmount,
           ReferenceId,
           isRecovered,
-          isConcernReceived,
+          isConsentReceived,
         },
       },
       { new: true, runValidators: true },

@@ -40,7 +40,7 @@ const patientSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    isConcernReceived: {
+    isConsentReceived: {
       type: Boolean,
       default: false,
     },
