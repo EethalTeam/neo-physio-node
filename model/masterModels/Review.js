@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 
-
 const ReviewSchema = new mongoose.Schema(
   {
     patientId: {
@@ -13,6 +12,11 @@ const ReviewSchema = new mongoose.Schema(
     },
     reviewDate: {
       type: Date,
+    },
+    Satisfaction: {
+      type: Number,
+      min: 0,
+      max: 100,
     },
     reviewTime: {
       type: String,
@@ -42,7 +46,7 @@ const ReviewSchema = new mongoose.Schema(
       ref: "Session",
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 const ReviewModel = mongoose.model("Review", ReviewSchema);
 module.exports = ReviewModel;
