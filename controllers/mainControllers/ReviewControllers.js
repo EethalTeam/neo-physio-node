@@ -135,13 +135,13 @@ exports.getAllReview = async (req, res) => {
 // Get Review by ID
 exports.getReviewById = async (req, res) => {
   try {
-    const { _id } = req.body;
+    const { patientId } = req.body;
 
-    if (!mongoose.Types.ObjectId.isValid(_id)) {
-      return res.status(400).json({ message: "Invalid ID" });
+    if (!mongoose.Types.ObjectId.isValid(patientId)) {
+      return res.status(400).json({ message: "Invalid patient ID" });
     }
 
-    const review = await Review.findById(_id)
+    const reviews = await Review.find({ patientId })
       .populate("patientId", "patientName shortTermGoals longTermGoals")
       .populate("physioId", "physioName")
       .populate("reviewTypeId", "reviewTypeName")
@@ -149,11 +149,13 @@ exports.getReviewById = async (req, res) => {
       .populate("reviewStatusId", "reviewStatusName")
       .populate("Satisfaction");
 
-    if (!review) {
-      return res.status(404).json({ message: "Review not found" });
+    if (!reviews.length) {
+      return res
+        .status(404)
+        .json({ message: "No reviews found for this patient" });
     }
 
-    res.status(200).json(review);
+    res.status(200).json(reviews);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
