@@ -337,7 +337,7 @@ exports.SessionStart = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
-exports.sessionStock = async (req, res) => {
+exports.sessionStop = async (req, res) => {
   try {
     const { _id, action } = req.body;
 

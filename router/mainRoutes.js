@@ -72,7 +72,7 @@ router.post("/Session/getAllSession", SessionControllers.getAllSessions);
 router.post("/Session/getSingleSession", SessionControllers.getSingleSession);
 router.post("/Session/updateSession", SessionControllers.updateSession);
 router.post("/Session/deleteSession", SessionControllers.deleteSession);
-router.post("/Session/sessionStock", SessionControllers.sessionStock);
+router.post("/Session/sessionStop", SessionControllers.sessionStop);
 
 //Session Start and End
 
