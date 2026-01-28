@@ -153,7 +153,8 @@ exports.getAllSessions = async (req, res) => {
         "sessionStatusId",
         "sessionStatusName sessionStatusColor sessionStatusTextColor",
       )
-      .populate("redFlags.redFlagId", "redflagName");
+      .populate("redFlags.redFlagId", "redflagName")
+      .sort({ sessionTime: 1, sessionDate: 1 });
 
     // Always return array
     return res.status(200).json(sessions || []);
@@ -543,7 +544,13 @@ exports.SessionEnd = async (req, res) => {
     } else {
       sessionend.sessionStatusId = Status._id;
     }
+    const sessionCounter = Session.find({ sessionStatusId: Status._id });
 
+    if (sessionCounter.length > 0) {
+      sessionend.sessionCount = sessionCounter.length + 1;
+    } else {
+      sessionend.sessionCount = 1;
+    }
     const session = await Session.findByIdAndUpdate(
       _id,
       { $set: sessionend },

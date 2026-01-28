@@ -95,13 +95,14 @@ const sessionSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    sessionCount: { type: Number },
     media: {
       type: String,
     },
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const SessionModel = mongoose.model("Session", sessionSchema);
