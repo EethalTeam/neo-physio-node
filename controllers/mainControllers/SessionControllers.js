@@ -28,10 +28,10 @@ exports.createSession = async (req, res) => {
       modeOfExercise,
       redFlags,
       homeExerciseAssigned,
-      modalities,
       modalitiesList,
       targetArea,
       media,
+      modalities,
     } = req.body;
 
     const lastSession = await Session.findOne(
@@ -70,10 +70,10 @@ exports.createSession = async (req, res) => {
       modeOfExercise,
       redFlags,
       homeExerciseAssigned,
-      modalities,
       modalitiesList,
       targetArea,
       media,
+      modalities,
     });
     await session.save();
 
@@ -258,10 +258,10 @@ exports.updateSession = async (req, res) => {
       modeOfExercise,
       redFlags,
       homeExerciseAssigned,
-      modalities,
       modalitiesList,
       targetArea,
       media,
+      modalities,
     } = req.body;
     let sessionDateTime;
     if (sessionDate && sessionTime) {
@@ -278,7 +278,7 @@ exports.updateSession = async (req, res) => {
           patientId,
           physioId,
           sessionDate,
-          sessionDateTime,
+          sessionDateTime, // ADD
           sessionDay,
           sessionTime,
           sessionFromTime,
@@ -289,10 +289,10 @@ exports.updateSession = async (req, res) => {
           modeOfExercise,
           redFlags,
           homeExerciseAssigned,
-          modalities,
           modalitiesList,
           targetArea,
           media,
+          modalities,
         },
       },
       { new: true, runValidators: true },
@@ -443,7 +443,7 @@ exports.SessionCancel = async (req, res) => {
         patientId: cancelledSession.patientId,
         physioId: cancelledSession.physioId,
         sessionDate: nextDate,
-        sessionDateTime: newSessionDateTime,
+        sessionDateTime: newSessionDateTime, // ADD
         sessionTime: cancelledSession.sessionTime,
         sessionStatusId: new mongoose.Types.ObjectId(
           "691ecb36b87c5c57dead47a7",
@@ -543,6 +543,7 @@ exports.SessionEnd = async (req, res) => {
       sessionFeedbackPros,
       redFlags,
       targetArea,
+      modeOfExercise,
       modalities,
       modalitiesList,
       sessionToTime,
@@ -554,6 +555,7 @@ exports.SessionEnd = async (req, res) => {
       sessionFeedbackPros,
       redFlags,
       targetArea,
+      modeOfExercise,
       modalities,
       modalitiesList,
       sessionToTime,
@@ -588,9 +590,23 @@ exports.SessionEnd = async (req, res) => {
 
     // GENERATE REVIEW AND NOTIFY HOD IF REDFLAGS EXIST
     if (redFlags && redFlags.length > 0) {
-      const formattedRedFlags = redFlags.map((id) => ({
-        redFlagId: new mongoose.Types.ObjectId(id.redFlagId),
-      }));
+      // const formattedRedFlags = redFlags.map((id) => ({
+      //   redFlagId: new mongoose.Types.ObjectId(id.redFlagId),
+      // }));
+
+      const formattedRedFlags = (redFlags || []).map((r) => {
+        let id = r.redFlagId;
+
+        if (typeof id === "object" && id._id) {
+          id = id._id;
+        }
+
+        if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+          throw new Error("Invalid redFlagId provided");
+        }
+
+        return { redFlagId: new mongoose.Types.ObjectId(id) };
+      });
 
       const reviewTypeDefault = await ReviewType.findOne({
         reviewTypeName: "RedFlags",
