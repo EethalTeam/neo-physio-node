@@ -154,7 +154,7 @@ exports.getAllSessions = async (req, res) => {
         "sessionStatusName sessionStatusColor sessionStatusTextColor",
       )
       .populate("redFlags.redFlagId", "redflagName")
-      .sort({ sessionTime: 1, sessionDate: 1 });
+      .sort({ sessionDate: 1, sessionTime: 1 });
 
     // Always return array
     return res.status(200).json(sessions || []);

@@ -26,9 +26,14 @@ app.use(
     verify: (req, res, buf) => {
       req.rawBody = buf; // Save the raw buffer to the request object
     },
-  })
+  }),
 );
-app.use(cors());
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+  }),
+);
 require("dotenv").config();
 
 // app.post('/api/chatWithGemini', (req,res)=>{
@@ -54,7 +59,10 @@ app.get("/test", (req, res) => {
 const server = http.createServer(app);
 
 const io = new Server(server, {
-  cors: { origin: "*" },
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
 });
 
 // const io = new Server(server, {
@@ -109,7 +117,7 @@ io.on("connection", (socket) => {
       } catch (err) {
         console.error("❌ Error sending notification:", err.message);
       }
-    }
+    },
   );
 
   // ================== Disconnect ==================
@@ -176,7 +184,7 @@ async function main() {
         serverSelectionTimeoutMS: 30000,
         socketTimeoutMS: 45000,
         connectTimeoutMS: 30000,
-      }
+      },
     );
 
     console.log("✅ MongoDB successfully connected");
