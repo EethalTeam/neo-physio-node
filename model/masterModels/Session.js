@@ -21,6 +21,11 @@ const sessionSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
+    sessionDateTime: {
+      type: Date,
+      index: true,
+    },
+
     sessionDay: {
       type: String,
       required: true,

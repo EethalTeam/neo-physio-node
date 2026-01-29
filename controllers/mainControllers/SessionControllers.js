@@ -34,8 +34,6 @@ exports.createSession = async (req, res) => {
       media,
     } = req.body;
 
-    //Automatic code genrate
-
     const lastSession = await Session.findOne(
       {},
       {},
@@ -51,7 +49,9 @@ exports.createSession = async (req, res) => {
     }
 
     const sessionCode = `SESSION${String(nextSessionNumber).padStart(3, "0")}`;
-
+    const sessionDateTime = new Date(
+      `${sessionDate.toISOString().split("T")[0]}T${sessionTime}:00`,
+    );
     // Create and save the Session
     const session = new Session({
       sessionCode,
@@ -61,6 +61,7 @@ exports.createSession = async (req, res) => {
       sessionDay,
       sessionTime,
       sessionFromTime,
+      sessionDateTime,
       sessionToTime,
       machineId,
       sessionStatusId,
@@ -135,6 +136,17 @@ exports.getAllSessions = async (req, res) => {
         $lt: new Date(nextDate),
       };
     }
+    await Session.find({ sessionDateTime: { $exists: false } }).then(
+      async (sessions) => {
+        for (const s of sessions) {
+          const dt = new Date(
+            `${s.sessionDate.toISOString().split("T")[0]}T${s.sessionTime}:00`,
+          );
+          s.sessionDateTime = dt;
+          await s.save();
+        }
+      },
+    );
 
     //  Role based filter
     if (storedRole === "Physio" && physioId) {
@@ -154,7 +166,7 @@ exports.getAllSessions = async (req, res) => {
         "sessionStatusName sessionStatusColor sessionStatusTextColor",
       )
       .populate("redFlags.redFlagId", "redflagName")
-      .sort({ sessionDate: 1, sessionTime: 1 });
+      .sort({ sessionDateTime: 1 });
 
     // Always return array
     return res.status(200).json(sessions || []);
@@ -251,6 +263,12 @@ exports.updateSession = async (req, res) => {
       targetArea,
       media,
     } = req.body;
+    let sessionDateTime;
+    if (sessionDate && sessionTime) {
+      sessionDateTime = new Date(
+        `${new Date(sessionDate).toISOString().split("T")[0]}T${sessionTime}:00`,
+      );
+    }
 
     const session = await Session.findByIdAndUpdate(
       _id,
@@ -260,6 +278,7 @@ exports.updateSession = async (req, res) => {
           patientId,
           physioId,
           sessionDate,
+          sessionDateTime,
           sessionDay,
           sessionTime,
           sessionFromTime,
@@ -416,10 +435,15 @@ exports.SessionCancel = async (req, res) => {
         "Saturday",
       ];
 
+      const newSessionDateTime = new Date(
+        `${nextDate.toISOString().split("T")[0]}T${cancelledSession.sessionTime}:00`,
+      );
+
       await Session.create({
         patientId: cancelledSession.patientId,
         physioId: cancelledSession.physioId,
         sessionDate: nextDate,
+        sessionDateTime: newSessionDateTime,
         sessionTime: cancelledSession.sessionTime,
         sessionStatusId: new mongoose.Types.ObjectId(
           "691ecb36b87c5c57dead47a7",
