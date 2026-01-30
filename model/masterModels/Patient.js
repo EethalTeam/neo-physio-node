@@ -40,6 +40,19 @@ const patientSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    recoveredAt: {
+      type: Date,
+      default: null,
+    },
+
+    stopReason: {
+      type: String,
+      trim: true,
+    },
+    recoveredType: {
+      type: String,
+      trim: true,
+    },
     isConsentReceived: {
       type: Boolean,
       default: false,

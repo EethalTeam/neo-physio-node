@@ -360,8 +360,25 @@ exports.updatePatients = async (req, res) => {
       feeAmount,
       ReferenceId,
       isRecovered,
+      recoveredAt,
+      stopReason,
+      recoveredType,
       isConsentReceived,
     } = req.body;
+    // Validation for recovered logic
+    if (isRecovered === true) {
+      if (!recoveredType) {
+        return res.status(400).json({
+          message: "Recovered type is required",
+        });
+      }
+
+      if (recoveredType === "Other" && !stopReason) {
+        return res.status(400).json({
+          message: "Stop reason is required when recovered type is Other",
+        });
+      }
+    }
 
     const Patients = await Patient.findByIdAndUpdate(
       _id,
@@ -429,6 +446,11 @@ exports.updatePatients = async (req, res) => {
           feeAmount,
           ReferenceId,
           isRecovered,
+          recoveredAt: isRecovered ? recoveredAt || new Date() : null,
+          stopReason:
+            isRecovered && recoveredType === "Other" ? stopReason : null,
+          recoveredType: isRecovered ? recoveredType : null,
+
           isConsentReceived,
         },
       },

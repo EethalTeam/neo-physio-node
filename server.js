@@ -4,7 +4,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const http = require("http");
 const { Server } = require("socket.io");
-
+const cron = require("node-cron");
 const masterRoutes = require("./router/masterRoutes");
 const mainRoutes = require("./router/mainRoutes");
 // const authRoutes = require('./routes/authRoutes');
@@ -196,7 +196,29 @@ async function main() {
     console.error("❌ Error connecting to MongoDB:", error.message);
   }
 }
+// const h = new Date().getHours();
+// const m = new Date().getMinutes();
+// const time = `${h}.${m}`;
+// const times = "18.24";
+// const condition = () => {
+//   if (time == times) {
+//     // const name = () => {
+//     console.log(time, "time");
+
+//     console.log(
+//       `check for Running corn ${new Date().getHours()}.${new Date().getMinutes()}.${new Date().getSeconds()}`,
+//     );
+//     // };
+//   }
+// };
+// console.log(time, "time");
+
+// const name = () => {
+//   console.log(
+//     `check for Running corn ${new Date().getHours()}.${new Date().getMinutes()}.${new Date().getSeconds()}`,
+//   );
+// };
 
 main();
-
+// cron.schedule("* * * * * *", condition);
 module.exports = app;

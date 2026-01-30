@@ -32,7 +32,9 @@ exports.getAllDashBoard = async (req, res) => {
     let startDate = new Date(year, month, 1);
     let endDate = new Date(year, month + 1, 1);
 
-    let patientRecover = await PatientModel.find({ isRecovered: true });
+    let patientRecover = await PatientModel.find({
+      recoveredType: "Patient Recovered",
+    });
     let physio = await Physio.find({ isActive: true });
 
     let monthlySessions = await Session.find({

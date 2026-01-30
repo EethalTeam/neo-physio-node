@@ -153,20 +153,37 @@ exports.getAllSessions = async (req, res) => {
       filter.physioId = physioId;
     }
 
-    const sessions = await Session.find(filter)
-      .populate("physioId", "physioName")
-      .populate({
-        path: "patientId",
-        populate: { path: "patientGenderId", select: "genderName" },
-      })
-      .populate("modalitiesList.modalityId", "modalitiesName")
-      .populate("machineId", "machineName")
-      .populate(
-        "sessionStatusId",
-        "sessionStatusName sessionStatusColor sessionStatusTextColor",
-      )
-      .populate("redFlags.redFlagId", "redflagName")
-      .sort({ sessionDateTime: 1 });
+    const sessions = (
+      await Session.find(filter)
+        .populate("physioId", "physioName")
+        .populate({
+          path: "patientId",
+          populate: { path: "patientGenderId", select: "genderName" },
+        })
+        .populate("modalitiesList.modalityId", "modalitiesName")
+        .populate("machineId", "machineName")
+        .populate(
+          "sessionStatusId",
+          "sessionStatusName sessionStatusColor sessionStatusTextColor",
+        )
+        .populate("redFlags.redFlagId", "redflagName")
+        // .populate({
+        //   path: "patientId",
+        //   match: { isRecovered: false },
+        // })
+        .sort({ sessionDateTime: 1 })
+    ).filter((s) => {
+      if (!s.patientId) return false;
+
+      const sessionDate = new Date(s.sessionDate);
+      sessionDate.setHours(0, 0, 0, 0);
+      const today = new Date();
+      if (s.patientId.isRecovered === true && sessionDate > today) {
+        return false;
+      }
+
+      return true; // show past & today
+    });
 
     // Always return array
     return res.status(200).json(sessions || []);
