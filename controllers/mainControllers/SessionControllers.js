@@ -126,12 +126,8 @@ exports.getAllSessions = async (req, res) => {
   try {
     const { Today, physioId, storedRole } = req.body;
 
-    const sessionCompletedId = new mongoose.Types.ObjectId(
-      "691ec69eae0e10763c8f21e0",
-    );
-    const sessionCancelledId = new mongoose.Types.ObjectId(
-      "692585f037162b40bd30a1ef",
-    );
+    const sessionCompletedId = new mongoose.Types.ObjectId("691ec69eae0e10763c8f21e0");
+    const sessionCancelledId = new mongoose.Types.ObjectId("692585f037162b40bd30a1ef");
 
     if (storedRole === "Physio" && physioId) {
       const today = new Date(Today);
@@ -147,18 +143,20 @@ exports.getAllSessions = async (req, res) => {
       const endOfLastDay = new Date(lastWorkingDay).setHours(23, 59, 59, 999);
 
       const incompleteSessions = await Session.find({
-        physioId: physioId,
-        sessionDate: { $gte: startOfLastDay, $lte: endOfLastDay },
+        physioId: new mongoose.Types.ObjectId(physioId),
+        sessionDate: { $gte: new Date(startOfLastDay), $lte: new Date(endOfLastDay) },
         sessionStatusId: { $nin: [sessionCompletedId, sessionCancelledId] },
       })
         .populate("physioId", "physioName")
-        .populate("patientId")
-        .populate("sessionStatusId", "sessionStatusName");
-      console.log(incompleteSessions, "incompleteSessions");
+        .populate({
+          path: "patientId",
+          populate: { path: "patientGenderId", select: "genderName" },
+        })
+        .populate("sessionStatusId", "sessionStatusName sessionStatusColor");
+
       if (incompleteSessions.length > 0) {
         return res.status(200).json({
-          message:
-            "Previous Incomplete sessions exists, Please complete them to start today's session",
+          message: "Previous Incomplete sessions exists, Please complete them to start today's session",
           incompleteData: incompleteSessions,
           blockToday: true,
         });
@@ -169,10 +167,10 @@ exports.getAllSessions = async (req, res) => {
     const startOfRequestedDay = new Date(Today).setHours(0, 0, 0, 0);
     const endOfRequestedDay = new Date(Today).setHours(23, 59, 59, 999);
 
-    filter.sessionDate = { $gte: startOfRequestedDay, $lte: endOfRequestedDay };
+    filter.sessionDate = { $gte: new Date(startOfRequestedDay), $lte: new Date(endOfRequestedDay) };
 
     if (storedRole === "Physio" && physioId) {
-      filter.physioId = physioId;
+      filter.physioId = new mongoose.Types.ObjectId(physioId);
     }
 
     const sessions = await Session.find(filter)
@@ -195,6 +193,7 @@ exports.getAllSessions = async (req, res) => {
       const sDate = new Date(s.sessionDate);
       sDate.setHours(0, 0, 0, 0);
       const now = new Date();
+      now.setHours(0, 0, 0, 0);
       if (s.patientId.isRecovered === true && sDate > now) {
         return false;
       }
