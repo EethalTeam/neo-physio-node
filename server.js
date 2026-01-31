@@ -7,6 +7,7 @@ const { Server } = require("socket.io");
 const cron = require("node-cron");
 const masterRoutes = require("./router/masterRoutes");
 const mainRoutes = require("./router/mainRoutes");
+const CronJobControllers = require("./controllers/mainControllers/CronJobControllers")
 // const authRoutes = require('./routes/authRoutes');
 
 // --- UNCOMMENTED FOR NOTIFICATIONS ---
@@ -65,6 +66,8 @@ const io = new Server(server, {
   },
 });
 
+CronJobControllers.initSessionCron(io);
+CronJobControllers.initDailySessionGeneration(io);
 // const io = new Server(server, {
 //   cors: {
 //     origin: "https://enishrm.grss.in",

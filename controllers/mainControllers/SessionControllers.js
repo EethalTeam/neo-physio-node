@@ -124,74 +124,86 @@ exports.createSession = async (req, res) => {
 // };
 exports.getAllSessions = async (req, res) => {
   try {
-    const { sessionDate, nextDate, physioId, storedRole } = req.body;
+    const { Today, physioId, storedRole } = req.body;
 
-    //ALWAYS define filter first
-    let filter = {};
+    const sessionCompletedId = "691ec69eae0e10763c8f21e0";
+    const sessionCancelledId = "692585f037162b40bd30a1ef";
+    
+    if (storedRole === "Physio" && physioId) {
+      const today = new Date(Today);
+      let lastWorkingDay = new Date(today);
+      
+      if (today.getDay() === 1) {
+        lastWorkingDay.setDate(today.getDate() - 2);
+      } else {
+        lastWorkingDay.setDate(today.getDate() - 1);
+      }
 
-    // Date filter
-    if (sessionDate && nextDate) {
-      filter.sessionDate = {
-        $gte: new Date(sessionDate),
-        $lt: new Date(nextDate),
-      };
+      const startOfLastDay = new Date(lastWorkingDay).setHours(0, 0, 0, 0);
+      const endOfLastDay = new Date(lastWorkingDay).setHours(23, 59, 59, 999);
+
+      const incompleteSessions = await Session.find({
+        physioId: physioId,
+        sessionDate: { $gte: startOfLastDay, $lte: endOfLastDay },
+        sessionStatusId: { $nin: [sessionCompletedId, sessionCancelledId] }
+      })
+      .populate("physioId", "physioName")
+      .populate("patientId")
+      .populate("sessionStatusId");
+      
+      if (incompleteSessions.length > 0) {
+        return res.status(200).json({
+          message: "Previous Incomplete sessions exists, Please complete them to start today's session",
+          incompleteData: incompleteSessions,
+          blockToday: true
+        });
+      }
     }
-    await Session.find({ sessionDateTime: { $exists: false } }).then(
-      async (sessions) => {
-        for (const s of sessions) {
-          const dt = new Date(
-            `${s.sessionDate.toISOString().split("T")[0]}T${s.sessionTime}:00`,
-          );
-          s.sessionDateTime = dt;
-          await s.save();
-        }
-      },
-    );
+    
+    let filter = {};
+    const startOfRequestedDay = new Date(Today).setHours(0, 0, 0, 0);
+    const endOfRequestedDay = new Date(Today).setHours(23, 59, 59, 999);
 
-    //  Role based filter
+    filter.sessionDate = { $gte: startOfRequestedDay, $lte: endOfRequestedDay };
+
     if (storedRole === "Physio" && physioId) {
       filter.physioId = physioId;
     }
 
-    const sessions = (
-      await Session.find(filter)
-        .populate("physioId", "physioName")
-        .populate({
-          path: "patientId",
-          populate: { path: "patientGenderId", select: "genderName" },
-        })
-        .populate("modalitiesList.modalityId", "modalitiesName")
-        .populate("machineId", "machineName")
-        .populate(
-          "sessionStatusId",
-          "sessionStatusName sessionStatusColor sessionStatusTextColor",
-        )
-        .populate("redFlags.redFlagId", "redflagName")
-        // .populate({
-        //   path: "patientId",
-        //   match: { isRecovered: false },
-        // })
-        .sort({ sessionDateTime: 1 })
-    ).filter((s) => {
+    const sessions = await Session.find(filter)
+      .populate("physioId", "physioName")
+      .populate({
+        path: "patientId",
+        populate: { path: "patientGenderId", select: "genderName" },
+      })
+      .populate("modalitiesList.modalityId", "modalitiesName")
+      .populate("machineId", "machineName")
+      .populate(
+        "sessionStatusId",
+        "sessionStatusName sessionStatusColor sessionStatusTextColor"
+      )
+      .populate("redFlags.redFlagId", "redflagName")
+      .sort({ sessionDateTime: 1 });
+    
+    const filteredSessions = sessions.filter((s) => {
       if (!s.patientId) return false;
-
-      const sessionDate = new Date(s.sessionDate);
-      sessionDate.setHours(0, 0, 0, 0);
-      const today = new Date();
-      if (s.patientId.isRecovered === true && sessionDate > today) {
+      const sDate = new Date(s.sessionDate);
+      sDate.setHours(0, 0, 0, 0);
+      const now = new Date();
+      if (s.patientId.isRecovered === true && sDate > now) {
         return false;
       }
-
-      return true; // show past & today
+      return true;
     });
 
-    // Always return array
-    return res.status(200).json(sessions || []);
+    return res.status(200).json(filteredSessions || []);
+
   } catch (error) {
     console.error("Get all sessions error:", error);
     res.status(500).json({ message: error.message });
   }
 };
+
 exports.getAllSessionsbyPatient = async (req, res) => {
   try {
     const { sessionDate, nextDate, physioId, storedRole, patientId } = req.body;
