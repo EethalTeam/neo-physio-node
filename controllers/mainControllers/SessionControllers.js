@@ -126,13 +126,17 @@ exports.getAllSessions = async (req, res) => {
   try {
     const { Today, physioId, storedRole } = req.body;
 
-    const sessionCompletedId = "691ec69eae0e10763c8f21e0";
-    const sessionCancelledId = "692585f037162b40bd30a1ef";
-    
+    const sessionCompletedId = new mongoose.Types.ObjectId(
+      "691ec69eae0e10763c8f21e0",
+    );
+    const sessionCancelledId = new mongoose.Types.ObjectId(
+      "692585f037162b40bd30a1ef",
+    );
+
     if (storedRole === "Physio" && physioId) {
       const today = new Date(Today);
       let lastWorkingDay = new Date(today);
-      
+
       if (today.getDay() === 1) {
         lastWorkingDay.setDate(today.getDate() - 2);
       } else {
@@ -145,21 +149,22 @@ exports.getAllSessions = async (req, res) => {
       const incompleteSessions = await Session.find({
         physioId: physioId,
         sessionDate: { $gte: startOfLastDay, $lte: endOfLastDay },
-        sessionStatusId: { $nin: [sessionCompletedId, sessionCancelledId] }
+        sessionStatusId: { $nin: [sessionCompletedId, sessionCancelledId] },
       })
-      .populate("physioId", "physioName")
-      .populate("patientId")
-      .populate("sessionStatusId");
-      
+        .populate("physioId", "physioName")
+        .populate("patientId")
+        .populate("sessionStatusId", "sessionStatusName");
+      console.log(incompleteSessions, "incompleteSessions");
       if (incompleteSessions.length > 0) {
         return res.status(200).json({
-          message: "Previous Incomplete sessions exists, Please complete them to start today's session",
+          message:
+            "Previous Incomplete sessions exists, Please complete them to start today's session",
           incompleteData: incompleteSessions,
-          blockToday: true
+          blockToday: true,
         });
       }
     }
-    
+
     let filter = {};
     const startOfRequestedDay = new Date(Today).setHours(0, 0, 0, 0);
     const endOfRequestedDay = new Date(Today).setHours(23, 59, 59, 999);
@@ -180,11 +185,11 @@ exports.getAllSessions = async (req, res) => {
       .populate("machineId", "machineName")
       .populate(
         "sessionStatusId",
-        "sessionStatusName sessionStatusColor sessionStatusTextColor"
+        "sessionStatusName sessionStatusColor sessionStatusTextColor",
       )
       .populate("redFlags.redFlagId", "redflagName")
       .sort({ sessionDateTime: 1 });
-    
+
     const filteredSessions = sessions.filter((s) => {
       if (!s.patientId) return false;
       const sDate = new Date(s.sessionDate);
@@ -197,7 +202,6 @@ exports.getAllSessions = async (req, res) => {
     });
 
     return res.status(200).json(filteredSessions || []);
-
   } catch (error) {
     console.error("Get all sessions error:", error);
     res.status(500).json({ message: error.message });
